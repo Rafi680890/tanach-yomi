@@ -305,7 +305,7 @@ function dayView() {
   if (first >= 0) missed = `<div class="banner">⏳ יש פרקים שלא סומנו<button data-jump="${Math.floor(first / PER_DAY)}">${chName(first)}</button></div>`;
   const bm = S.bm ? `<div class="banner">🔖 עד כאן למדתי: ${chName(S.bm.g)} פסוק ${gem(S.bm.v + 1)}<button data-read="${S.bm.g}" data-v="${S.bm.v}">המשך</button></div>` : "";
   const pct = Math.round(doneCount() / TOTAL * 100);
-  return `<div class="hero"><div class="htop"><div class="logo"><img src="logo.png" alt="קהילת אבני החושן"></div><div class="hded"><div><small>לעילוי נשמת</small><b>ר׳ אברהם בן ברכה</b></div><i></i><div><small>ולעילוי נשמת</small><b>חנה בת חג׳ילה</b></div></div></div><h1>תנ״ך <b>יומי</b></h1><p>שני פרקים בכל יום · מספר יהושע ועד דברי הימים</p><div class="orn">✦</div></div>
+  return `<div class="hero"><div class="htop"><div class="logo"><img src="logo.png" alt="קהילת אבני החושן"></div><div class="hded"><div><small>לעילוי נשמת</small><b>ר׳ אברהם בן ברכה</b></div><i></i><div><small>ולעילוי נשמת</small><b>חנה בת חג׳ילה</b></div><i></i><div><small>ולעילוי נשמת</small><b>שלום שלומי בן חנה</b></div></div></div><h1>תנ״ך <b>יומי</b></h1><p>שני פרקים בכל יום · מספר יהושע ועד דברי הימים</p><div class="orn">✦</div></div>
   <div class="card datecard"><div class="he">${hebFmt.format(d)}</div><div class="gr">${wdFmt.format(d)} · ${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}</div>
   ${i >= 0 && i < DAYS ? `<span class="chip">יום ${i + 1} מתוך ${DAYS}</span>` : ""}
   <div class="nav"><button data-step="1">› אתמול</button>${isToday ? "" : `<button class="p" data-today>היום</button>`}<button data-step="-1">מחר ‹</button></div></div>
