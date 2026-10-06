@@ -24,10 +24,16 @@ svg{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColo
 .hero{margin:0 -14px;padding:calc(22px + env(safe-area-inset-top)) 18px 70px;text-align:center;color:#fff;border-radius:0 0 34px 34px;
  background:radial-gradient(circle at 15% 10%,rgba(217,164,65,.35),transparent 45%),radial-gradient(circle at 90% 90%,rgba(255,255,255,.12),transparent 40%),linear-gradient(160deg,var(--hero1),var(--hero2) 60%,var(--hero3))}
 .logo{display:inline-block;background:#fff;border-radius:18px;padding:8px 14px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
-.logo img{display:block;height:84px;width:auto}
+.logo img{display:block;height:72px;width:auto}
 .hero h1{margin:16px 0 2px;font-size:38px;font-weight:800;letter-spacing:.5px}
 .hero h1 b{color:var(--gold)}
 .hero p{margin:0;opacity:.9;font-size:15px}
+.htop{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hded{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 12px;border:1px solid rgba(217,164,65,.55);border-radius:14px;background:rgba(255,255,255,.08);text-align:center}
+.hded div{line-height:1.25}
+.hded i{width:26px;height:1px;background:var(--gold);opacity:.8}
+.hded small{display:block;color:var(--gold);font-size:10.5px;font-weight:700;letter-spacing:.6px}
+.hded b{display:block;font-size:13px;font-weight:700;color:#fff}
 .orn{display:flex;align-items:center;gap:10px;justify-content:center;color:var(--gold);margin:10px auto 0;max-width:260px}
 .orn:before,.orn:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
 .orn:after{transform:scaleX(-1)}
@@ -40,14 +46,18 @@ svg{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColo
 .nav button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:9px 18px;font-weight:600}
 .nav button.p{background:var(--accent);color:var(--card);border-color:var(--accent)}
 /* chapter cards */
-.chap{display:flex;align-items:center;gap:12px;border-inline-start:7px solid var(--cc,var(--accent));padding:14px}
+.chap{display:flex;align-items:center;gap:12px;padding:14px 22px 14px 14px;position:relative;overflow:hidden}
+.chap:before{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:9px;background:linear-gradient(180deg,var(--hero1),var(--hero2) 60%,var(--hero3))}
 .chap .t{flex:1}
 .chap .t small{color:var(--cc);font-weight:700;font-size:14px}
 .chap .t b{font-size:26px;display:block;line-height:1.2}
 .chap .t span{font-size:14px;color:var(--mute)}
 .chap .btns{display:flex;flex-direction:column;gap:8px}
 .btn{border:0;border-radius:12px;padding:10px 16px;font-weight:700;white-space:nowrap}
-.btn.read{background:var(--cc,var(--accent));color:#fff}
+.btn.read{background:linear-gradient(135deg,var(--hero1),var(--hero2) 65%,var(--hero3));color:#fff;font-size:18px;font-weight:800;padding:8px 18px 8px 12px;display:flex;align-items:center;gap:9px;box-shadow:0 5px 14px rgba(16,41,80,.35)}
+.btn.read .ic{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;flex:none}
+.btn.read .ic svg{width:20px;height:20px;stroke-width:2.2}
+.btn.read:active{transform:scale(.97)}
 .btn.chk{background:var(--bg);border:2px solid var(--line);color:var(--mute)}
 .btn.chk.on{background:var(--ok);border-color:var(--ok);color:#fff}
 .chap.done .t b{color:var(--ok)}
@@ -187,6 +197,7 @@ const I = {
   book: '<svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19V5"/></svg>',
   chart: '<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>',
   cal: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
+  openbook: '<svg viewBox="0 0 24 24"><path d="M12 6.5C9.8 5 7 4.5 3.5 4.5v13c3.5 0 6.3.5 8.5 2 2.2-1.5 5-2 8.5-2v-13C17 4.5 14.2 5 12 6.5z"/><path d="M12 6.5v13"/></svg>',
   check: '<svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>'
 };
 
@@ -256,8 +267,7 @@ let POP = [];
 
 /* ---------- תצוגות ---------- */
 function footer(src) {
-  return `<footer class="ft"><div class="ded"><small>לעילוי נשמת</small><b>ר׳ אברהם בן ברכה</b><small>ולעילוי נשמת</small><b>חנה בת חג׳ילה</b></div>
-  <div class="cp">© כל הזכויות שמורות לרפאל בטיט</div>${src ? `<div class="src">טקסט: מקרא על פי המסורה (MAM, CC-BY-SA) · פירושים: מצודת דוד ומצודת ציון (נחלת הכלל) · באמצעות ספריא</div>` : ""}</footer>`;
+  return `<footer class="ft"><div class="cp">© כל הזכויות שמורות לרפאל בטיט</div>${src ? `<div class="src">טקסט: מקרא על פי המסורה (MAM, CC-BY-SA) · פירושים: מצודת דוד ומצודת ציון (נחלת הכלל) · באמצעות ספריא</div>` : ""}</footer>`;
 }
 function tabs() {
   const on = route.v === "progress" || route.v === "book" ? "p" : "d";
@@ -287,7 +297,7 @@ function dayView() {
     const g = i * PER_DAY + k; if (g >= TOTAL) break;
     const done = S.done[g], bm = S.bm && S.bm.g === g ? `🔖 סימניה בפסוק ${gem(S.bm.v + 1)}` : `${B[CH[g].b].c[CH[g].c].length} פסוקים`;
     body += `<div class="card chap ${done ? "done" : ""}" style="--cc:var(${GROUPS[groupOf(CH[g].b)][3]})"><div class="t"><small>${GROUPS[groupOf(CH[g].b)][0]}</small><b>${chName(g)}</b><span>${bm}</span></div>
-      <div class="btns"><button class="btn read" data-read="${g}">${I.book} לקריאה</button><button class="btn chk ${done ? "on" : ""}" data-toggle="${g}">${I.check} ${done ? "נלמד" : "למדתי"}</button></div></div>`;
+      <div class="btns"><button class="btn read" data-read="${g}"><span class="ic">${I.openbook}</span>לקריאה</button><button class="btn chk ${done ? "on" : ""}" data-toggle="${g}">${I.check} ${done ? "נלמד" : "למדתי"}</button></div></div>`;
   }
   let missed = "";
   const cur = dayIdx(today()), lim = Math.min(cur, DAYS) * PER_DAY;
@@ -295,7 +305,7 @@ function dayView() {
   if (first >= 0) missed = `<div class="banner">⏳ יש פרקים שלא סומנו<button data-jump="${Math.floor(first / PER_DAY)}">${chName(first)}</button></div>`;
   const bm = S.bm ? `<div class="banner">🔖 עד כאן למדתי: ${chName(S.bm.g)} פסוק ${gem(S.bm.v + 1)}<button data-read="${S.bm.g}" data-v="${S.bm.v}">המשך</button></div>` : "";
   const pct = Math.round(doneCount() / TOTAL * 100);
-  return `<div class="hero"><div class="logo"><img src="logo.png" alt="קהילת אבני החושן"></div><h1>תנ״ך <b>יומי</b></h1><p>שני פרקים בכל יום · מספר יהושע ועד דברי הימים</p><div class="orn">✦</div></div>
+  return `<div class="hero"><div class="htop"><div class="logo"><img src="logo.png" alt="קהילת אבני החושן"></div><div class="hded"><div><small>לעילוי נשמת</small><b>ר׳ אברהם בן ברכה</b></div><i></i><div><small>ולעילוי נשמת</small><b>חנה בת חג׳ילה</b></div></div></div><h1>תנ״ך <b>יומי</b></h1><p>שני פרקים בכל יום · מספר יהושע ועד דברי הימים</p><div class="orn">✦</div></div>
   <div class="card datecard"><div class="he">${hebFmt.format(d)}</div><div class="gr">${wdFmt.format(d)} · ${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}</div>
   ${i >= 0 && i < DAYS ? `<span class="chip">יום ${i + 1} מתוך ${DAYS}</span>` : ""}
   <div class="nav"><button data-step="1">› אתמול</button>${isToday ? "" : `<button class="p" data-today>היום</button>`}<button data-step="-1">מחר ‹</button></div></div>
