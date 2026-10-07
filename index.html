@@ -139,6 +139,10 @@ select{width:100%;height:46px;border:1px solid var(--line);background:var(--card
 .bmcard .tx small{color:var(--bmc);font-weight:800;font-size:13px}
 .bmcard .tx b{display:block;font-size:20px}
 .bmcard .tx span{display:block;font-family:"TanachFont",serif;font-size:17px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl}
+.rls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 2px;font-size:14px;color:var(--mute);font-weight:700}
+.chap .rls{margin:8px 0 0}
+.rl{max-width:100%;text-decoration:none;border-radius:999px;padding:9px 14px;font-weight:800;font-size:14px;line-height:1.2;display:inline-block}
+.rl.sp{background:#1db954;color:#07210f}.rl.ez{background:var(--accent);color:var(--card)}
 .sharecard{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,var(--card),rgba(37,160,100,.12));border:2px solid #25a064}
 .sharecard .tx{flex:1;min-width:150px}.sharecard .tx b{display:block;font-size:19px;color:var(--accent)}.sharecard .tx span{font-size:14px;color:var(--mute)}
 .sharecard .go{border:0;background:#25a064;color:#fff;border-radius:12px;padding:13px 16px;font-weight:800;font-size:17px;width:100%}
@@ -356,6 +360,36 @@ function annotate(words, cs) {
 let POP = [];
 
 /* ---------- תצוגות ---------- */
+/* קישורי העמקה לפי ספר. הקישורים לספר מופיעים רק מהיום שבו הלימוד מגיע אליו בלוח. */
+const SPOTIFY = { 0: "https://open.spotify.com/show/3vwz2wQgsFF5fdZGLnPFyd" };   // הרב מוטי פרנקו - להוסיף ספר נוסף: מספר הספר: קישור לסדרה
+const ETZ = "https://etzion.org.il/he/series/tanakh-yomi-";
+const ETZION = { 0: "yehoshua", 1: "shoftim", 2: "shmuel-alef-bet", 3: "shmuel-alef-bet", 4: "melakhim-alef-bet", 5: "melakhim-alef-bet", 6: "yeshayahu", 7: "yirmeyahu", 8: "yechezkel",
+  21: "tehillim", 22: "mishlei", 23: "iyov", 24: "shir-hashirim", 25: "megillat-rut", 26: "eikha", 27: "kohelet", 28: "ester", 29: "daniel", 30: "ezra", 31: "nechemia" };
+for (let b = 9; b <= 20; b++) ETZION[b] = "trei-asar";
+/* שיעורי הר עציון ליהושע: לכל פרק (או זוג פרקים) - שם הקישור הקצר וכותרת השיעור */
+const ETZ_YEHOSHUA = "https://etzion.org.il/he/tanakh/neviim/sefer-yehoshua/";
+const YL = {};
+[[[1], "1-bein-moshe-leyehoshua", "בין משה עבד ה׳ ליהושע משרת משה"], [[2], "2-ha-im-hameraglim-hitzlichu", "האם המרגלים הצליחו?"], [[3, 4], "3-4-chatzayat-hayarden", "חציית הירדן"],
+ [[5], "5-matai-nikhtav-sefer-yehoshua", "מתי נכתב ספר יהושע?"], [[6], "6-mivtza-tzevai-o-tekes-dati", "מבצע צבאי או טקס דתי?"], [[7, 8], "7-8-chet-achan-umilchemet-ha-ay", "חטא עכן ומלחמת העי"],
+ [[9], "9-kocha-shel-shevua", "כוחה של שבועה"], [[10], "10-milchama-michutz-lachoma", "מלחמה מחוץ לחומה"], [[11], "11-milchemet-malkhei-hatzafon", "מלחמת (מלכי) הצפון"],
+ [[12], "12-chatimat-pirkei-hakibbush", "חתימת פרקי הכיבוש"], [[13], "13-haaretz-nishara-harbeh-meod-lerishta", "הארץ נשארה הרבה מאוד לרשתה"], [[14], "14-mapat-hahitnachlut", "מפת ההתנחלות"],
+ [[15, 16], "perakim-15-16", "נחלות יהודה ויוסף"], [[17], "17-menashe-bekhor-yosef", "מנשה בכור יוסף"], [[18], "18-hashevatim-hamitrapim", "השבטים המתרפים"],
+ [[19], "19-hemshekh-teurei-hanachalot", "המשך תיאורי הנחלות"], [[20], "20-arei-miklat", "ערי מקלט"], [[21], "21-arei-haleviim", "ערי הלויים"],
+ [[22], "22-kimat-milchemet-achim", "כמעט מלחמת אחים"], [[23, 24], "23-24-neumei-yehoshua-ukritat-habrit", "נאומי יהושע לעם לפני מותו וכריתת הברית"]]
+  .forEach(([chs, slug, title]) => chs.forEach(c => YL[c] = { url: ETZ_YEHOSHUA + slug, title }));
+/* קישורי ישיר לפרקים ב-Spotify (מספר ספר:מספר פרק -> מזהה הפרק). פרק בלי מזהה לא מציג כפתור שמע. */
+const SPOTIFY_EP = { "0:1": "67jGSw9AKxfZ2QfY0JOeF0", "0:2": "1j3CxDkDHvAQZG3yXUKoOr", "0:3": "6Op9Ml5K053NA9k9SxjMpk", "0:4": "7D4tC3zLzhAcRTG3ItsSfl", "0:5": "6osFWnK2fXVPPjXc2qEpZs", "0:6": "27oVEu4SUDJ23Ybuhm36io", "0:7": "1a0eg9Qfczq2Ph2vK0aIq0", "0:8": "6ug1CIqYWiI8vMtZUDZdiA", "0:9": "2XDC913b4DoCL9YYfcnXlA", "0:10": "2xS0CGc39fNRCOQPjegR5l", "0:11": "4d4EJLojHivi7NXiM5uFJf", "0:12": "0nAWORsXQ3smEIVBCWvR1w", "0:13": "72idb0HyEsCfAcdXSyOdj0", "0:14": "3KVQBDbOS3zByCD27JuQxX", "0:15": "5fyn2pYkcRREGPcYrZaRmY", "0:16": "6v9fhdP1DbXj9xMlpmgd98", "0:17": "3N7HKvV80Mvxegr0Pn5sjk", "0:18": "1oiAu4e186hXrDuNBtTKas", "0:19": "4K1DN4LZCqfljjcu3x35a2", "0:20": "2iw7kOzIjgxJS92jYp1wHb", "0:21": "0gfpLNEbaYtZ2MuQUtvwD3", "0:22": "64gmRHZpyRXhGxIrReP0NV", "0:23": "1NATlWRTT94gZxVIo4QTOI", "0:24": "0cKfbOZU8lkq45xuKbUL8s" };
+const started = b => dayIdx(today()) >= Math.floor(firstG[b] / PER_DAY);
+function resLinks(g, compact) {
+  const b = CH[g].b, c = CH[g].c + 1, out = [];
+  const sid = SPOTIFY_EP[b + ":" + c];                       // רק קישור מדויק לפרק - בלי חיפוש
+  if (sid && started(b)) out.push(`<a class="rl sp" href="https://open.spotify.com/episode/${sid}" target="_blank" rel="noopener">🎧 ${compact ? "שמע" : "שמע: הרב פרנקו · פרק " + gem(c)}</a>`);
+  if (ETZION[b] && started(b)) {
+    const yl = b === 0 ? YL[c] : null;
+    out.push(`<a class="rl ez" href="${yl ? yl.url : ETZ + ETZION[b]}" target="_blank" rel="noopener">📚 ${compact ? "שיעור" : (yl ? "שיעור: " + yl.title : "שיעורי הר עציון")}</a>`);
+  }
+  return out.length ? `<div class="rls">${compact ? "" : "<span>להעמקה:</span>"}${out.join("")}</div>` : "";
+}
 const SHARE_URL = "https://rafi680890.github.io/tanach-yomi/";
 const SHARE_TEXT = "📖 תנ״ך יומי: שני פרקים בכל יום, מיהושע ועד דברי הימים - עם ניקוד, טעמי מקרא ופירוש מצודת דוד ומצודת ציון.";
 async function shareApp() {
@@ -371,7 +405,7 @@ const installHelpHTML = () => `<button class="x" data-close aria-label="סגור
 <li>או פשוט המשיכו להשתמש באתר דרך הדפדפן, בלי להתקין.</li></ol>`;
 const MAM_SRC = "https://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%AA%D7%9E%D7%A9:Dovi/%D7%9E%D7%A7%D7%A8%D7%90_%D7%A2%D7%9C_%D7%A4%D7%99_%D7%94%D7%9E%D7%A1%D7%95%D7%A8%D7%94";
 function footer(src) {
-  return `<footer class="ft"><div class="cp">© רפאל בטיט · כל הזכויות שמורות על עיצוב ופיתוח האפליקציה</div>${src ? `<div class="src">נוסח המקרא: <a href="${MAM_SRC}" target="_blank" rel="noopener">מקרא על פי המסורה (MAM)</a>, ברישיון CC-BY-SA, באמצעות ספריא. בתצוגה זו הוצג הקרי בלבד במקום כתיב וקרי, הוסרו סימוני פתוחות וסתומות, וטעמי המקרא ניתנים להסתרה. פירושי מצודת דוד ומצודת ציון: נחלת הכלל.</div>` : ""}</footer>`;
+  return `<footer class="ft"><div class="cp">© רפאל בטיט · כל הזכויות שמורות על עיצוב ופיתוח האפליקציה</div>${src ? `<div class="src">נוסח המקרא: <a href="${MAM_SRC}" target="_blank" rel="noopener">מקרא על פי המסורה (MAM)</a>, ברישיון CC-BY-SA, באמצעות ספריא. בתצוגה זו הוצג הקרי בלבד במקום כתיב וקרי, הוסרו סימוני פתוחות וסתומות, וטעמי המקרא ניתנים להסתרה. פירושי מצודת דוד ומצודת ציון: נחלת הכלל. קישורי שמע ולימוד: הרב מוטי פרנקו (Spotify) וישיבת הר עציון.</div>` : ""}</footer>`;
 }
 function tabs() {
   const on = route.v === "progress" || route.v === "book" ? "p" : "d", pct = Math.round(doneCount() / TOTAL * 100);
@@ -411,7 +445,7 @@ function dayView() {
   else for (let k = 0; k < PER_DAY; k++) {
     const g = i * PER_DAY + k; if (g >= TOTAL) break;
     const done = isDone(g), hasBm = bmAt(g), bm = hasBm ? `🔖 עצרת בפסוק ${gem(S.bm.v + 1)} מתוך ${gem(vcount(g))}` : `${vcount(g)} פסוקים`;
-    body += `<div class="card chap ${done ? "done" : ""}" style="--cc:var(${GROUPS[groupOf(CH[g].b)][3]})"><div class="t"><small>${GROUPS[groupOf(CH[g].b)][0]}</small><b>${chName(g)}</b><span>${bm}</span></div>
+    body += `<div class="card chap ${done ? "done" : ""}" style="--cc:var(${GROUPS[groupOf(CH[g].b)][3]})"><div class="t"><small>${GROUPS[groupOf(CH[g].b)][0]}</small><b>${chName(g)}</b><span>${bm}</span>${resLinks(g, true)}</div>
       <div class="btns"><button class="btn read" data-read="${g}"${hasBm ? ` data-v="${S.bm.v}" data-resume` : ""}><span class="ic">${I.openbook}</span>${hasBm ? "המשך מפסוק " + gem(S.bm.v + 1) : "לקריאה"}</button><button class="btn chk ${done ? "on" : ""}" data-toggle="${g}">${I.check} ${done ? "למדתי" : "סמן כנלמד"}</button></div></div>`;
   }
   let missed = "";
@@ -499,7 +533,7 @@ function readView() {
   const hint = !S.hintBm && !S.bm ? `<div class="hint"><div>💡 <b>למדתם עד כאן?</b> לחצו על מספר הפסוק (עם סימן הסימניה) כדי לסמן. בפעם הבאה תמשיכו בדיוק משם.</div><button data-hint>הבנתי</button></div>` : "";
   
   return `<header class="rh"><button class="home" data-home>${I.home}<span>חזרה לדף הבית</span></button><div class="rt">${chName(g)}</div><button class="gear" data-set aria-label="הגדרות תצוגה">Aa</button></header>
-  ${legend}${hint}<div class="text" style="--fs:${S.fs}px">${t}</div>${footer(true)}
+  ${resLinks(g)}${legend}${hint}<div class="text" style="--fs:${S.fs}px">${t}</div>${footer(true)}
   <div class="rbar"><button data-prev ${g === 0 ? "disabled" : ""}>› הפרק הקודם<small>${pv}</small></button><button class="learn ${done ? "on" : ""}" data-toggle="${g}">${done ? "✓ למדתי" : "סמן כנלמד"}</button><button class="next" data-next ${g + 1 >= TOTAL ? "disabled" : ""}>הפרק הבא ‹<small>${nx}</small></button></div>`;
 }
 let lastBm = null;
