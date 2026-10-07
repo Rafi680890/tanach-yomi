@@ -138,8 +138,8 @@ select{width:100%;height:46px;border:1px solid var(--line);background:var(--card
 .seg{display:flex;gap:6px}
 .seg button{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 12px;font-weight:700}
 .seg button.on{background:var(--accent);color:var(--card);border-color:var(--accent)}
-.themes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
-.themes button{border:2px solid var(--line);border-radius:14px;padding:10px 6px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--bg)}
+.themes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.themes button{border:2px solid var(--line);border-radius:14px;padding:10px 4px;font-size:15px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--bg)}
 .themes button.on{border-color:var(--accent)}
 .themes i{width:34px;height:22px;border-radius:6px;border:1px solid rgba(0,0,0,.2)}
 .sw{width:52px;height:30px;border-radius:999px;border:0;background:var(--line);position:relative;flex:none}
@@ -192,7 +192,7 @@ try {
   S.done = Object.fromEntries(Object.keys(S.done && typeof S.done === "object" ? S.done : {}).filter(k => k in KG).map(k => [k, 1]));
   if (!okBm(S.bm)) S.bm = null;
   if (!(Number.isFinite(S.fs) && S.fs >= 16 && S.fs <= 48)) S.fs = 26;
-  if (!["light", "sepia", "dark"].includes(S.theme)) S.theme = "light";
+  if (!["light", "sepia", "dark", "auto"].includes(S.theme)) S.theme = "light";
   if (!Number.isInteger(S.from) || S.from < 0) S.from = 0;
   S.taamim = S.taamim !== false; S.cd = S.cd !== false; S.cz = S.cz !== false;
 }
@@ -201,7 +201,10 @@ const isDone = g => !!S.done[ck(g)];
 const bmG = () => S.bm ? KG[S.bm.k] : undefined;
 const bmAt = (g, v) => S.bm && KG[S.bm.k] === g && (v === undefined || S.bm.v === v);
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
-document.documentElement.dataset.theme = S.theme;
+const darkMQ = window.matchMedia ? matchMedia("(prefers-color-scheme: dark)") : null;
+function applyTheme() { document.documentElement.dataset.theme = S.theme === "auto" ? (darkMQ && darkMQ.matches ? "dark" : "light") : S.theme; }
+applyTheme();
+if (darkMQ) (darkMQ.addEventListener ? darkMQ.addEventListener("change", applyTheme) : darkMQ.addListener(applyTheme));
 
 /* ---------- עזרים ---------- */
 function heb(n) {
@@ -452,7 +455,7 @@ function openPop(ids) {
   openSheet(`<button class="x" data-close aria-label="סגור">✕</button>` + cs.map(c => `<div class="cmt ${c.src}"><span class="src">${c.src === "d" ? "מצודת דוד" : "מצודת ציון"}</span>${c.h ? `<h4>${c.h}</h4>` : ""}<div>${c.b}</div></div>`).join(""));
 }
 function settingsHTML() {
-  const th = [["light", "יום", "#f4efe4"], ["sepia", "קלף", "#efe2c3"], ["dark", "לילה", "#12161c"]];
+  const th = [["auto", "אוטומטי", "linear-gradient(90deg,#f4efe4 50%,#12161c 50%)"], ["light", "יום", "#f4efe4"], ["sepia", "קלף", "#efe2c3"], ["dark", "לילה", "#12161c"]];
   const sw = (k, on) => `<button class="sw ${on ? "on" : ""}" data-sw="${k}" role="switch" aria-checked="${on}"></button>`;
   return `<button class="x" data-close aria-label="סגור">✕</button><h3 class="sh" style="margin-top:4px">הגדרות תצוגה</h3>
   <div class="row"><span>גודל הכתב</span><div class="seg"><button data-fs="-2">א−</button><button class="on" disabled>${S.fs}</button><button data-fs="2">א+</button></div></div>
@@ -460,6 +463,7 @@ function settingsHTML() {
   <div class="row"><span>פירוש מצודת דוד <i style="display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--hld);vertical-align:middle"></i></span>${sw("cd", S.cd)}</div>
   <div class="row"><span>פירוש מצודת ציון <i style="display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--hlz);vertical-align:middle"></i></span>${sw("cz", S.cz)}</div>
   <div style="margin-top:12px;font-weight:700">מצב תצוגה</div>
+  <div style="font-size:13px;color:var(--mute)">"אוטומטי" עוקב אחרי ההגדרה של המכשיר (בהיר או כהה)</div>
   <div class="themes" style="margin-top:8px">${th.map(([k, n, c]) => `<button class="${S.theme === k ? "on" : ""}" data-th="${k}"><i style="background:${c}"></i>${n}</button>`).join("")}</div>`;
 }
 
@@ -473,7 +477,7 @@ document.addEventListener("click", e => {
   else if (D.p) openPop(D.p);
   else if (t.hasAttribute("data-set")) openSheet(settingsHTML());
   else if (D.sw) { S[D.sw] = !S[D.sw]; save(); t.classList.toggle("on", S[D.sw]); t.setAttribute("aria-checked", S[D.sw]); route.keep = true; render(); }
-  else if (D.th) { S.theme = D.th; document.documentElement.dataset.theme = S.theme; save(); document.querySelectorAll("#sheet [data-th]").forEach(b => b.classList.toggle("on", b.dataset.th === S.theme)); }
+  else if (D.th) { S.theme = D.th; applyTheme(); save(); document.querySelectorAll("#sheet [data-th]").forEach(b => b.classList.toggle("on", b.dataset.th === S.theme)); }
   else if (D.fs && t.closest("#sheet")) { S.fs = Math.min(48, Math.max(16, S.fs + +D.fs)); save(); const tx = $(".text"); if (tx) tx.style.setProperty("--fs", S.fs + "px"); const lb = t.parentElement.querySelector(".on"); if (lb) lb.textContent = S.fs; }
   else if (t.hasAttribute("data-home")) go({ v: "day", date: lastDay || iso(today()) });
   else if (t.hasAttribute("data-retry")) { delete txFail[CH[route.g].b]; render(); }
