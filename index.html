@@ -19,7 +19,7 @@
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"UIFont",system-ui,"Segoe UI",Arial,sans-serif;font-size:17px}
 button,select,input{font:inherit;color:inherit}button{cursor:pointer}
 svg{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#app{max-width:720px;margin:0 auto;padding:0 14px calc(92px + env(safe-area-inset-bottom))}
+#app{max-width:720px;margin:0 auto;padding:0 14px calc(104px + env(safe-area-inset-bottom))}
 /* hero */
 .hero{margin:0 -14px;padding:calc(22px + env(safe-area-inset-top)) 18px 70px;text-align:center;color:#fff;border-radius:0 0 34px 34px;
  background:radial-gradient(circle at 15% 10%,rgba(217,164,65,.35),transparent 45%),radial-gradient(circle at 90% 90%,rgba(255,255,255,.12),transparent 40%),linear-gradient(160deg,var(--hero1),var(--hero2) 60%,var(--hero3))}
@@ -42,6 +42,16 @@ svg{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColo
 .datecard .he{font-size:30px;font-weight:800;color:var(--accent);line-height:1.2}
 .datecard .gr{font-size:17px;color:var(--mute);margin-top:4px}
 .chip{display:inline-block;margin-top:10px;background:linear-gradient(90deg,var(--c2),var(--c3));color:#fff;border-radius:999px;padding:4px 14px;font-size:14px;font-weight:600}
+.strip{display:flex;gap:6px;margin-top:12px}
+.dy{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:7px 0 8px;font-size:13px;color:var(--mute);line-height:1.2;font-weight:600}
+.dy b{display:block;font-size:17px;color:var(--ink);margin-top:2px;font-weight:800}
+.dy.sel{background:var(--accent);border-color:var(--accent);color:#cfe0f5}.dy.sel b{color:#fff}
+.dy.today{box-shadow:inset 0 -4px 0 var(--gold)}
+.dy:disabled{opacity:.35;cursor:default}
+.weeknav{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:10px}
+.weeknav button{border:0;background:none;color:var(--accent);font-weight:800;font-size:15px;padding:8px 4px}
+.weeknav .td{border:2px solid var(--accent);border-radius:999px;padding:6px 22px;background:var(--accent);color:#fff}
+.weeknav .td.off{background:none;color:var(--mute);border:2px dashed var(--line);opacity:.8}
 .nav{display:flex;gap:8px;margin-top:14px;justify-content:center;flex-wrap:wrap}
 .nav button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:9px 18px;font-weight:600}
 .nav button.p{background:var(--accent);color:var(--card);border-color:var(--accent)}
@@ -76,10 +86,12 @@ h3.sh{margin:0 0 10px;font-size:19px;color:var(--accent);display:flex;align-item
 .sels{display:grid;grid-template-columns:1.1fr 1.3fr 1fr;gap:8px}
 select{width:100%;height:46px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:0 10px;font-size:17px;color:var(--ink)}
 .sels2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.tabs{position:fixed;bottom:0;inset-inline:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:6;box-shadow:0 -4px 16px rgba(0,0,0,.06)}
-.tabs button{flex:1;border:0;background:none;padding:10px 4px;font-size:14px;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:2px}
+.tabs{position:fixed;bottom:0;inset-inline:0;background:var(--card);border-top:1px solid var(--line);display:flex;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));z-index:6;box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+.tabs button{flex:1;border:0;border-radius:14px;background:none;padding:8px 4px;font-size:14px;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:2px}
 .tabs svg{width:24px;height:24px}
 .tabs button.on{color:var(--accent);font-weight:800}
+.tabs button.hl{background:linear-gradient(135deg,#1b5e86,#1b8a94);color:#fff;font-weight:800;box-shadow:0 5px 14px rgba(27,94,134,.5);position:relative}
+.tabs button.hl i{position:absolute;top:-9px;left:10px;background:var(--gold);color:#14305a;border-radius:999px;font-style:normal;font-size:12px;font-weight:800;padding:1px 8px}
 .sec{font-size:15px;font-weight:800;margin:20px 4px 4px;display:flex;align-items:center;gap:8px}
 .sec:before{content:"";width:6px;height:18px;border-radius:3px;background:var(--cc)}
 .book{display:block;width:100%;text-align:right;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:6px 0}
@@ -127,6 +139,11 @@ select{width:100%;height:46px;border:1px solid var(--line);background:var(--card
 .bmcard .tx small{color:var(--bmc);font-weight:800;font-size:13px}
 .bmcard .tx b{display:block;font-size:20px}
 .bmcard .tx span{display:block;font-family:"TanachFont",serif;font-size:17px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl}
+.sharecard{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,var(--card),rgba(37,160,100,.12));border:2px solid #25a064}
+.sharecard .tx{flex:1;min-width:150px}.sharecard .tx b{display:block;font-size:19px;color:var(--accent)}.sharecard .tx span{font-size:14px;color:var(--mute)}
+.sharecard .go{border:0;background:#25a064;color:#fff;border-radius:12px;padding:13px 16px;font-weight:800;font-size:17px;width:100%}
+.sharecard .help{border:0;background:none;color:var(--mute);text-decoration:underline;font-size:13px;width:100%;padding:0}
+.help-steps{font-size:16px;line-height:1.7}.help-steps li{margin-bottom:8px}.help-steps b{color:var(--accent)}
 .bmcard{flex-wrap:wrap}
 .bmcard .go{border:0;background:var(--bmc);color:#fff;border-radius:12px;padding:13px 14px;font-weight:800;font-size:17px;width:100%}
 .vn{font-family:"UIFont",system-ui,sans-serif;font-size:.5em;line-height:1.1;color:var(--accent);border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin-inline-end:6px;cursor:pointer;vertical-align:middle;background:var(--card);white-space:nowrap;min-width:34px}
@@ -339,13 +356,36 @@ function annotate(words, cs) {
 let POP = [];
 
 /* ---------- תצוגות ---------- */
+const SHARE_URL = "https://rafi680890.github.io/tanach-yomi/";
+const SHARE_TEXT = "📖 תנ״ך יומי: שני פרקים בכל יום, מיהושע ועד דברי הימים - עם ניקוד, טעמי מקרא ופירוש מצודת דוד ומצודת ציון.";
+async function shareApp() {
+  try { if (navigator.share) { await navigator.share({ title: "תנ״ך יומי", text: SHARE_TEXT, url: SHARE_URL }); return; } }
+  catch (e) { if (e && e.name === "AbortError") return; }
+  window.open("https://wa.me/?text=" + encodeURIComponent(SHARE_TEXT + " " + SHARE_URL), "_blank", "noopener");
+}
+const shareCard = () => `<div class="card sharecard"><div class="tx"><b>📤 שתפו עם חברים ומשפחה</b><span>לחיצה אחת - ווטסאפ והודעות, עם הקישור והסבר קצר</span></div><button class="go" data-share>שתפו את האפליקציה</button><button class="help" data-installhelp>מופיעה אזהרה בהתקנה באנדרואיד? לחצו כאן</button></div>`;
+const installHelpHTML = () => `<button class="x" data-close aria-label="סגור">✕</button><h3 class="sh" style="margin-top:4px">בעיה בהתקנה באנדרואיד</h3>
+<p style="margin:0 0 10px">אם מופיעה הודעה <b>״Google Play Protect: אפליקציה לא בטוחה נחסמה״</b> - זו אזהרה כללית של אנדרואיד על אפליקציות אינטרנט, והאפליקציה עצמה בטוחה (היא אתר, בלי קבצים מסוכנים). אפשר להמשיך כך:</p>
+<ol class="help-steps"><li>בהודעה לחצו על <b>״פרטים נוספים״</b> ואז על <b>״התקן בכל זאת״</b>.</li>
+<li>אם אין כפתור כזה: ב-Chrome פתחו את התפריט ⋮ ובחרו <b>״הוסף למסך הבית״</b>, ואז <b>״צור קיצור דרך״</b> (לא ״התקן״). האייקון יופיע במסך הבית ויעבוד כרגיל.</li>
+<li>או פשוט המשיכו להשתמש באתר דרך הדפדפן, בלי להתקין.</li></ol>`;
 const MAM_SRC = "https://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%AA%D7%9E%D7%A9:Dovi/%D7%9E%D7%A7%D7%A8%D7%90_%D7%A2%D7%9C_%D7%A4%D7%99_%D7%94%D7%9E%D7%A1%D7%95%D7%A8%D7%94";
 function footer(src) {
   return `<footer class="ft"><div class="cp">© רפאל בטיט · כל הזכויות שמורות על עיצוב ופיתוח האפליקציה</div>${src ? `<div class="src">נוסח המקרא: <a href="${MAM_SRC}" target="_blank" rel="noopener">מקרא על פי המסורה (MAM)</a>, ברישיון CC-BY-SA, באמצעות ספריא. בתצוגה זו הוצג הקרי בלבד במקום כתיב וקרי, הוסרו סימוני פתוחות וסתומות, וטעמי המקרא ניתנים להסתרה. פירושי מצודת דוד ומצודת ציון: נחלת הכלל.</div>` : ""}</footer>`;
 }
 function tabs() {
-  const on = route.v === "progress" || route.v === "book" ? "p" : "d";
-  return `<nav class="tabs"><button class="${on === "d" ? "on" : ""}" data-go="day">${I.home}<span>דף הבית</span></button><button class="${on === "p" ? "on" : ""}" data-go="progress">${I.chart}<span>התקדמות</span></button></nav>`;
+  const on = route.v === "progress" || route.v === "book" ? "p" : "d", pct = Math.round(doneCount() / TOTAL * 100);
+  return `<nav class="tabs"><button class="hl" data-go="progress" ${on === "p" ? 'aria-current="page"' : ""}><i>${pct}%</i>${I.chart}<span>התקדמות שלי</span></button><button class="${on === "d" ? "on" : ""}" data-go="day">${I.home}<span>דף הבית</span></button></nav>`;
+}
+const DOW = ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳"];
+function weekStrip(d, isToday) {
+  const sun = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay(), 12), td = iso(today());
+  let cells = "";
+  for (let k = 0; k < 7; k++) {
+    const x = new Date(sun.getFullYear(), sun.getMonth(), sun.getDate() + k, 12), i = dayIdx(x), ok = i >= 0 && i < DAYS, id = iso(x), hd = hebOf(x).dt;
+    cells += `<button class="dy ${id === route.date ? "sel" : ""} ${id === td ? "today" : ""}" ${ok ? `data-day="${id}"` : "disabled"} aria-label="יום ${DOW[k]} ${hd}">${DOW[k]}<b>${hd}</b></button>`;
+  }
+  return `<div class="strip">${cells}</div><div class="weeknav"><button data-week="-1">› שבוע קודם</button><button class="td ${isToday ? "off" : ""}" data-today ${isToday ? "disabled" : ""}>היום</button><button data-week="1">שבוע הבא ‹</button></div>`;
 }
 function dateNav(d) {
   const cur = DL.find(x => x.iso === iso(d)) || DL[Math.max(0, Math.min(DAYS - 1, dayIdx(d)))];
@@ -388,10 +428,10 @@ function dayView() {
   return `<div class="hero"><div class="htop"><div class="logo"><img src="logo.png" alt="קהילת אבני החושן"></div><div class="hded"><div><small>לעילוי נשמת</small><b>ר׳ אברהם בן ברכה</b></div><i></i><div><small>ולעילוי נשמת</small><b>חנה בת חג׳ילה</b></div><i></i><div><small>ולעילוי נשמת</small><b>שלום שלומי בן חנה</b></div></div></div><h1>תנ״ך <b>יומי</b></h1><p>שני פרקים בכל יום · מספר יהושע ועד דברי הימים</p><div class="orn">✦</div></div>
   <div class="card datecard"><div class="he">${hebFmt.format(d)}</div><div class="gr">${wdFmt.format(d)} · ${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}</div>
   ${i >= 0 && i < DAYS ? `<span class="chip">יום ${i + 1} מתוך ${DAYS}</span>` : ""}
-  <div class="nav"><button data-step="1">› אתמול</button>${isToday ? "" : `<button class="p" data-today>היום</button>`}<button data-step="-1">מחר ‹</button></div></div>
+  ${weekStrip(d, isToday)}</div>
   ${bm}${body}${missed}
   <div class="card prog"><div class="ring" style="--p:${pct}"><i>${pct}%</i></div><div style="flex:1"><b style="font-size:18px">התקדמות כללית</b><div style="color:var(--mute);margin:2px 0 8px">${doneCount()} מתוך ${TOTAL} פרקים נלמדו</div><div class="bar"><i style="width:${pct}%"></i></div></div></div>
-  ${dateNav(d)}${footer(true)}${tabs()}`;
+  ${shareCard()}${dateNav(d)}${footer(true)}${tabs()}`;
 }
 function progressView() {
   let h = `<header class="rh" style="margin-bottom:12px"><button class="home" data-go="day">${I.home}<span>חזרה לדף הבית</span></button><div class="rt">התקדמות</div></header>`;
@@ -404,7 +444,7 @@ function progressView() {
       h += `<button class="book" data-book="${b}"><div class="r"><b>${B[b].n}</b><span>${k} / ${n}</span></div><div class="bar"><i style="width:${k / n * 100}%;background:var(${col})"></i></div></button>`;
     }
   }
-  h += `<div class="card"><h3 class="sh">💾 גיבוי ושחזור</h3><div style="color:var(--mute);font-size:14px;margin-bottom:8px">ההתקדמות נשמרת רק במכשיר הזה. כדאי לשמור גיבוי, כדי לא לאבד אותה אם נתוני הדפדפן יימחקו או כשעוברים למכשיר אחר.</div><div class="nav" style="justify-content:flex-start"><button data-bk="copy">העתק קוד גיבוי</button><button data-bk="file">שמור גיבוי לקובץ</button><button data-bk="restore">שחזר מקוד</button><button data-bk="load">שחזר מקובץ</button></div><input type="file" id="bkf" accept=".json,application/json" hidden></div>`;
+  h += `<div class="card"><h3 class="sh">💾 גיבוי ושחזור</h3><div style="color:var(--mute);font-size:14px;margin-bottom:8px">ההתקדמות נשמרת רק במכשיר הזה. כדאי לשמור גיבוי, כדי לא לאבד אותה אם נתוני הדפדפן יימחקו או כשעוברים למכשיר אחר.</div><div class="nav" style="justify-content:flex-start"><button data-bk="copy">העתק קוד גיבוי</button><button data-bk="file">שמור גיבוי לקובץ</button><button data-bk="restore">שחזר מקוד</button><button data-bk="load">שחזר מקובץ</button></div><input type="file" id="bkf" accept=".json,application/json" hidden></div>` + shareCard();
   return h + footer(false) + tabs();
 }
 function bookView() {
@@ -508,7 +548,7 @@ function settingsHTML() {
 /* ---------- אירועים ---------- */
 document.addEventListener("click", e => {
   if (e.target.id === "ov") return closeSheet();
-  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-step],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk]");
+  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk]");
   if (!t) return;
   const D = t.dataset;
   if (t.hasAttribute("data-close")) closeSheet();
@@ -518,6 +558,8 @@ document.addEventListener("click", e => {
   else if (D.th) { S.theme = D.th; applyTheme(); save(); document.querySelectorAll("#sheet [data-th]").forEach(b => b.classList.toggle("on", b.dataset.th === S.theme)); }
   else if (D.fs && t.closest("#sheet")) { S.fs = Math.min(48, Math.max(16, S.fs + +D.fs)); save(); const tx = $(".text"); if (tx) tx.style.setProperty("--fs", S.fs + "px"); const lb = t.parentElement.querySelector(".on"); if (lb) lb.textContent = S.fs; }
   else if (t.hasAttribute("data-home")) go({ v: "day", date: lastDay || iso(today()) });
+  else if (t.hasAttribute("data-share")) shareApp();
+  else if (t.hasAttribute("data-installhelp")) openSheet(installHelpHTML());
   else if (t.hasAttribute("data-hint")) { S.hintBm = true; save(); route.keep = true; render(); }
   else if (t.hasAttribute("data-bmclear")) { S.bm = null; save(); toast("הסימניה הוסרה"); route.keep = true; render(); }
   else if (t.hasAttribute("data-retry")) { delete txFail[CH[route.g].b]; render(); }
@@ -537,7 +579,8 @@ document.addEventListener("click", e => {
     const g = +D.toggle; if (isDone(g)) delete S.done[ck(g)]; else { S.done[ck(g)] = 1; toast("סומן כנלמד ✓"); }
     save(); route.keep = true; render();
   }
-  else if (D.step) { const d = parseISO(route.date); d.setDate(d.getDate() - +D.step); go({ v: "day", date: iso(d) }); }
+  else if (D.day) go({ v: "day", date: D.day });
+  else if (D.week) { const i = Math.min(DAYS - 1, Math.max(0, dayIdx(parseISO(route.date)) + 7 * +D.week)); go({ v: "day", date: iso(dateOfIdx(i)) }); }
   else if (t.hasAttribute("data-today")) go({ v: "day", date: iso(today()) });
   else if (D.jump) go({ v: "day", date: iso(dateOfIdx(+D.jump)) });
   else if (D.book) go({ v: "book", b: +D.book });
