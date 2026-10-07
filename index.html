@@ -12,9 +12,9 @@
 @font-face{font-family:"TanachFont";src:url(font.woff2) format("woff2");font-weight:100 900;font-stretch:62% 100%;font-display:swap}
 @font-face{font-family:"UIFont";src:url(font-ui.woff2) format("woff2");font-weight:100 900;font-display:swap}
 :root{--bg:#f4efe4;--card:#fffdf8;--ink:#23262d;--mute:#6d6a62;--accent:#14305a;--ok:#22875a;--line:#e6dec9;--mark:#fff1b8;--fs:26px;
- --hld:#fde2a0;--hlz:#c6ecd6;--c1:#b4572b;--c2:#1b7f8c;--c3:#6a3fa0;--gold:#d9a441;--hero1:#0f2750;--hero2:#1b5e86;--hero3:#1b8a94}
-[data-theme=dark]{--bg:#12161c;--card:#1b2029;--ink:#e9e5da;--mute:#9b978c;--accent:#9cc0f0;--ok:#5fc287;--line:#2b323d;--mark:#4a4220;--hld:#5a4a1a;--hlz:#1f5a3d;--c1:#e08a5c;--c2:#52b8c4;--c3:#b394e6}
-[data-theme=sepia]{--bg:#efe2c3;--card:#f8edd3;--ink:#3b2f1a;--mute:#7a6a4a;--accent:#6b3f1d;--ok:#3d7a43;--line:#d8c79d;--mark:#f3d982;--hld:#f4cf7a;--hlz:#bfe0c0}
+ --hld:#fde2a0;--hlz:#c6ecd6;--bmc:#9b2c3d;--bmbg:rgba(155,44,61,.10);--bmflash:rgba(155,44,61,.32);--c1:#b4572b;--c2:#1b7f8c;--c3:#6a3fa0;--gold:#d9a441;--hero1:#0f2750;--hero2:#1b5e86;--hero3:#1b8a94}
+[data-theme=dark]{--bmc:#e57a8e;--bmbg:rgba(229,122,142,.14);--bmflash:rgba(229,122,142,.38);--bg:#12161c;--card:#1b2029;--ink:#e9e5da;--mute:#9b978c;--accent:#9cc0f0;--ok:#5fc287;--line:#2b323d;--mark:#4a4220;--hld:#5a4a1a;--hlz:#1f5a3d;--c1:#e08a5c;--c2:#52b8c4;--c3:#b394e6}
+[data-theme=sepia]{--bmc:#8a2c1d;--bmbg:rgba(138,44,29,.12);--bmflash:rgba(138,44,29,.34);--bg:#efe2c3;--card:#f8edd3;--ink:#3b2f1a;--mute:#7a6a4a;--accent:#6b3f1d;--ok:#3d7a43;--line:#d8c79d;--mark:#f3d982;--hld:#f4cf7a;--hlz:#bfe0c0}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"UIFont",system-ui,"Segoe UI",Arial,sans-serif;font-size:17px}
 button,select,input{font:inherit;color:inherit}button{cursor:pointer}
@@ -108,7 +108,29 @@ select{width:100%;height:46px;border:1px solid var(--line);background:var(--card
 .legend i{width:16px;height:16px;border-radius:5px;display:inline-block}
 .text{font-family:"TanachFont","Noto Serif Hebrew","Ezra SIL","SBL Hebrew","Times New Roman",serif;font-size:var(--fs);line-height:2.2;text-align:right;hyphens:none;margin-top:8px}
 .v{border-radius:8px;transition:background .3s}
-.v.bm{background:var(--mark)}
+.v.bm{background:var(--bmbg)}
+.v.pulse{animation:bmpulse .9s ease-in-out 3}
+@keyframes bmpulse{0%,100%{background:var(--bmbg)}50%{background:var(--bmflash)}}
+.vn.on{background:var(--bmc);border-color:var(--bmc);color:#fff}
+.vn svg{width:1.1em;height:1.1em;vertical-align:-.18em;margin-inline-start:5px}
+.vn.on svg{fill:currentColor}
+.bmline{display:flex;align-items:center;gap:10px;margin:8px 0 14px;color:var(--bmc);font-family:"UIFont",system-ui,sans-serif;font-size:16px;font-weight:800;line-height:1.2}
+.bmline:before,.bmline:after{content:"";flex:1;height:2px;background:var(--bmc);opacity:.85}
+.bmline button{border:1px solid var(--bmc);background:transparent;color:var(--bmc);border-radius:999px;font-size:12px;font-weight:700;padding:3px 10px}
+.hint{display:flex;align-items:center;gap:12px;background:var(--card);border:2px dashed var(--bmc);border-radius:16px;padding:12px 14px;margin:10px 0 4px;font-family:"UIFont",system-ui,sans-serif;font-size:15px;line-height:1.5}
+.hint b{color:var(--bmc)}
+.hint button{border:0;background:var(--bmc);color:#fff;border-radius:10px;padding:9px 14px;font-weight:700;white-space:nowrap}
+.bmfloat{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom));z-index:7;border:0;background:var(--bmc);color:#fff;border-radius:999px;padding:11px 20px;font-weight:800;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.3);display:none}
+.bmfloat.show{display:block}
+.bmcard{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,var(--card),var(--bmbg));border:2px solid var(--bmc);padding:14px}
+.bmcard .ico{width:46px;height:46px;border-radius:50%;background:var(--bmc);color:#fff;display:grid;place-items:center;flex:none}
+.bmcard .ico svg{width:24px;height:24px;fill:currentColor}
+.bmcard .tx{flex:1;min-width:0}
+.bmcard .tx small{color:var(--bmc);font-weight:800;font-size:13px}
+.bmcard .tx b{display:block;font-size:20px}
+.bmcard .tx span{display:block;font-family:"TanachFont",serif;font-size:17px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl}
+.bmcard{flex-wrap:wrap}
+.bmcard .go{border:0;background:var(--bmc);color:#fff;border-radius:12px;padding:13px 14px;font-weight:800;font-size:17px;width:100%}
 .vn{font-family:"UIFont",system-ui,sans-serif;font-size:.5em;line-height:1.1;color:var(--accent);border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin-inline-end:6px;cursor:pointer;vertical-align:middle;background:var(--card);white-space:nowrap;min-width:34px}
 .vn:focus-visible,.hl:focus-visible,.lo:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .pb{display:block;height:.6em}
@@ -176,7 +198,7 @@ const KEY = "tanachYomi.v1";
 const ck = g => B[CH[g].b].n + ":" + (CH[g].c + 1);          // מפתח יציב: "שמואל א:12"
 const KG = Object.create(null); CH.forEach((_, g) => KG[ck(g)] = g);
 const vcount = g => B[CH[g].b].c[CH[g].c];
-let S = { v: 2, done: {}, bm: null, from: 0, fs: 26, taamim: true, theme: "light", cd: true, cz: true };
+let S = { v: 2, done: {}, bm: null, hintBm: false, from: 0, fs: 26, taamim: true, theme: "light", cd: true, cz: true };
 try {
   const raw = JSON.parse(localStorage.getItem(KEY) || "{}");
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw 0;
@@ -199,6 +221,7 @@ try {
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 const isDone = g => !!S.done[ck(g)];
 const bmG = () => S.bm ? KG[S.bm.k] : undefined;
+const BMI = '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';
 const bmAt = (g, v) => S.bm && KG[S.bm.k] === g && (v === undefined || S.bm.v === v);
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
 const darkMQ = window.matchMedia ? matchMedia("(prefers-color-scheme: dark)") : null;
@@ -273,7 +296,7 @@ function loadText(b) {
   if (TX[b] || txLoading[b]) return; txLoading[b] = 1; delete txFail[b];
   fetch("text/" + b + ".json").then(r => { if (!r.ok) throw 0; return r.json(); }).then(j => { TX[b] = j; })
     .catch(() => { txFail[b] = 1; })
-    .finally(() => { delete txLoading[b]; if (route.v === "read" && CH[route.g].b === b) render(); });
+    .finally(() => { delete txLoading[b]; if (route.v === "read" && CH[route.g].b === b) render(); else if (route.v === "day" && bmG() != null && CH[bmG()].b === b) { route.keep = true; render(); } });
 }
 const NIK = /[֑-ׇ͏]/g;
 const norm = s => s.replace(NIK, "").replace(/[^א-ת]/g, "");
@@ -343,21 +366,26 @@ function dayView() {
   else if (i >= DAYS) body = `<div class="card">🎉 סיימנו את כל הנביאים והכתובים. חזק וברוך!</div>`;
   else for (let k = 0; k < PER_DAY; k++) {
     const g = i * PER_DAY + k; if (g >= TOTAL) break;
-    const done = isDone(g), bm = bmAt(g) ? `🔖 סימניה בפסוק ${gem(S.bm.v + 1)}` : `${vcount(g)} פסוקים`;
+    const done = isDone(g), hasBm = bmAt(g), bm = hasBm ? `🔖 עצרת בפסוק ${gem(S.bm.v + 1)} מתוך ${gem(vcount(g))}` : `${vcount(g)} פסוקים`;
     body += `<div class="card chap ${done ? "done" : ""}" style="--cc:var(${GROUPS[groupOf(CH[g].b)][3]})"><div class="t"><small>${GROUPS[groupOf(CH[g].b)][0]}</small><b>${chName(g)}</b><span>${bm}</span></div>
-      <div class="btns"><button class="btn read" data-read="${g}"><span class="ic">${I.openbook}</span>לקריאה</button><button class="btn chk ${done ? "on" : ""}" data-toggle="${g}">${I.check} ${done ? "למדתי" : "סמן כנלמד"}</button></div></div>`;
+      <div class="btns"><button class="btn read" data-read="${g}"${hasBm ? ` data-v="${S.bm.v}"` : ""}><span class="ic">${I.openbook}</span>${hasBm ? "המשך מפסוק " + gem(S.bm.v + 1) : "לקריאה"}</button><button class="btn chk ${done ? "on" : ""}" data-toggle="${g}">${I.check} ${done ? "למדתי" : "סמן כנלמד"}</button></div></div>`;
   }
   let missed = "";
   const cur = dayIdx(today()), lim = Math.min(cur, DAYS) * PER_DAY;
   let first = -1; for (let g = Math.max(0, S.from || 0); g < Math.min(lim, TOTAL); g++) if (!isDone(g)) { first = g; break; }
   if (first >= 0) missed = `<div class="banner col"><div>⏳ יש פרקים קודמים שלא סומנו כנלמדו</div><div class="bb"><button data-jump="${Math.floor(first / PER_DAY)}">לפרק שחסר: ${chName(first)}</button><button data-join>התחלתי מהיום</button><button data-markall>סמן הכול כנלמד</button></div></div>`;
-  const bm = S.bm && bmG() != null ? `<div class="banner">🔖 עד כאן למדתי: ${chName(bmG())} פסוק ${gem(S.bm.v + 1)}<button data-read="${bmG()}" data-v="${S.bm.v}">המשך</button></div>` : "";
+  let bm = "";
+  if (S.bm && bmG() != null) {
+    const bg = bmG(), bb = CH[bg].b; loadText(bb);
+    const vtxt = TX[bb] && TX[bb][CH[bg].c][S.bm.v] ? stripT(TX[bb][CH[bg].c][S.bm.v]).trim().split(/\s+/).slice(0, 7).join(" ") + " …" : "";
+    bm = `<div class="card bmcard"><div class="ico">${BMI}</div><div class="tx"><small>המשך מהמקום שעצרת</small><b>${chName(bg)} · פסוק ${gem(S.bm.v + 1)}</b>${vtxt ? `<span>${vtxt}</span>` : ""}</div><button class="go" data-read="${bg}" data-v="${S.bm.v}">המשך ללמוד ‹</button></div>`;
+  }
   const pct = Math.round(doneCount() / TOTAL * 100);
   return `<div class="hero"><div class="htop"><div class="logo"><img src="logo.png" alt="קהילת אבני החושן"></div><div class="hded"><div><small>לעילוי נשמת</small><b>ר׳ אברהם בן ברכה</b></div><i></i><div><small>ולעילוי נשמת</small><b>חנה בת חג׳ילה</b></div><i></i><div><small>ולעילוי נשמת</small><b>שלום שלומי בן חנה</b></div></div></div><h1>תנ״ך <b>יומי</b></h1><p>שני פרקים בכל יום · מספר יהושע ועד דברי הימים</p><div class="orn">✦</div></div>
   <div class="card datecard"><div class="he">${hebFmt.format(d)}</div><div class="gr">${wdFmt.format(d)} · ${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}</div>
   ${i >= 0 && i < DAYS ? `<span class="chip">יום ${i + 1} מתוך ${DAYS}</span>` : ""}
   <div class="nav"><button data-step="1">› אתמול</button>${isToday ? "" : `<button class="p" data-today>היום</button>`}<button data-step="-1">מחר ‹</button></div></div>
-  ${body}${bm}${missed}
+  ${bm}${body}${missed}
   <div class="card prog"><div class="ring" style="--p:${pct}"><i>${pct}%</i></div><div style="flex:1"><b style="font-size:18px">התקדמות כללית</b><div style="color:var(--mute);margin:2px 0 8px">${doneCount()} מתוך ${TOTAL} פרקים נלמדו</div><div class="bar"><i style="width:${pct}%"></i></div></div></div>
   ${dateNav(d)}${footer(true)}${tabs()}`;
 }
@@ -418,22 +446,34 @@ function readView() {
   POP = [];
   let t = ""; vs.forEach((v, i) => {
     const pb = v.endsWith("\n");
-    t += `<span class="v ${bmAt(g, i) ? "bm" : ""}" id="v${i}"><button class="vn" data-bm="${i}" aria-label="סימניה בפסוק ${gem(i + 1)}">${gem(i + 1)}</button>${verseHTML(v, i, g, j)}</span>${pb ? '<span class="pb"></span>' : ""}`;
+    t += `<span class="v ${bmAt(g, i) ? "bm" : ""} ${route.pulseV === i && Date.now() < route.pulseUntil ? "pulse" : ""}" id="v${i}"><button class="vn ${bmAt(g, i) ? "on" : ""}" data-bm="${i}" aria-pressed="${bmAt(g, i)}" aria-label="סימניה: עד כאן למדתי, פסוק ${gem(i + 1)}">${gem(i + 1)}${BMI}</button>${verseHTML(v, i, g, j)}</span>${pb ? '<span class="pb"></span>' : ""}`;
+    if (bmAt(g, i)) t += `<div class="bmline" id="bmline"><span>🔖 עד כאן למדתי</span><button data-bmclear>הסר</button></div>`;
   });
   const done = isDone(g), nx = g + 1 < TOTAL ? chName(g + 1) : "", pv = g > 0 ? chName(g - 1) : "";
-  const legend = (S.cd || S.cz) ? `<div class="legend">${S.cd ? '<span><i style="background:var(--hld)"></i>מצודת דוד</span>' : ""}${S.cz ? '<span><i style="background:var(--hlz)"></i>מצודת ציון</span>' : ""}<span>· לחצו על מילה מסומנת לפירוש</span></div>` : "";
+  const legend = ((S.cd || S.cz) ? `<div class="legend">${S.cd ? '<span><i style="background:var(--hld)"></i>מצודת דוד</span>' : ""}${S.cz ? '<span><i style="background:var(--hlz)"></i>מצודת ציון</span>' : ""}<span>· לחצו על מילה מסומנת לפירוש</span></div>` : "")
+    + `<div class="legend"><span style="color:var(--bmc);font-weight:700">${BMI.replace("<svg", '<svg style="width:15px;height:15px;stroke:currentColor;fill:none"')} לחצו על מספר פסוק כדי לסמן עד היכן למדתם</span></div>`;
+  const hint = !S.hintBm && !S.bm ? `<div class="hint"><div>💡 <b>למדתם עד כאן?</b> לחצו על מספר הפסוק (עם סימן הסימניה) כדי לסמן. בפעם הבאה תמשיכו בדיוק משם.</div><button data-hint>הבנתי</button></div>` : "";
+  const floatBtn = bmAt(g) ? `<button class="bmfloat" id="bmfloat" data-gobm>🔖 עד כאן: פסוק ${gem(S.bm.v + 1)}</button>` : "";
   return `<header class="rh"><button class="home" data-home>${I.home}<span>חזרה לדף הבית</span></button><div class="rt">${chName(g)}</div><button class="gear" data-set aria-label="הגדרות תצוגה">Aa</button></header>
-  ${legend}<div class="text" style="--fs:${S.fs}px">${t}</div>${footer(true)}
+  ${legend}${hint}<div class="text" style="--fs:${S.fs}px">${t}</div>${footer(true)}${floatBtn}
   <div class="rbar"><button data-prev ${g === 0 ? "disabled" : ""}>› הפרק הקודם<small>${pv}</small></button><button class="learn ${done ? "on" : ""}" data-toggle="${g}">${done ? "✓ למדתי" : "סמן כנלמד"}</button><button class="next" data-next ${g + 1 >= TOTAL ? "disabled" : ""}>הפרק הבא ‹<small>${nx}</small></button></div>`;
 }
+let bmObs = null;
+function pulseVerse(v, el) { route.pulseV = v; route.pulseUntil = Date.now() + 2800; el.classList.remove("pulse"); void el.offsetWidth; el.classList.add("pulse"); }
 function render() {
   const sy = window.scrollY, app = $("#app");
   app.innerHTML = route.v === "read" ? readView() : route.v === "book" ? bookView() : route.v === "progress" ? progressView() : dayView();
   if (route.v === "read") {
     const t = route.scrollV != null ? route.scrollV : (bmAt(route.g) ? S.bm.v : null);
     const el = t != null ? $("#v" + t) : null;
-    if (route.keep) window.scrollTo(0, sy); else if (el) el.scrollIntoView({ block: "center" }); else window.scrollTo(0, 0);
+    if (route.keep) window.scrollTo(0, sy); else if (el) { el.scrollIntoView({ block: "center" }); pulseVerse(t, el); } else window.scrollTo(0, 0);
     route.keep = false; route.scrollV = null;
+    if (bmObs) { bmObs.disconnect(); bmObs = null; }
+    const fb = $("#bmfloat"), tgt = bmAt(route.g) ? $("#v" + S.bm.v) : null;
+    if (fb && tgt && window.IntersectionObserver) {
+      bmObs = new IntersectionObserver(es => es.forEach(en => { fb.classList.toggle("show", !en.isIntersecting); if (!en.isIntersecting) fb.textContent = (en.boundingClientRect.top < 0 ? "↑ " : "↓ ") + "🔖 עד כאן: פסוק " + gem(S.bm.v + 1); }), { threshold: 0.1 });
+      bmObs.observe(tgt);
+    }
   } else if (route.keep) { window.scrollTo(0, sy); route.keep = false; } else window.scrollTo(0, 0);
 }
 
@@ -470,7 +510,7 @@ function settingsHTML() {
 /* ---------- אירועים ---------- */
 document.addEventListener("click", e => {
   if (e.target.id === "ov") return closeSheet();
-  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-step],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-retry],[data-join],[data-markall],[data-bk]");
+  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-step],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-gobm],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk]");
   if (!t) return;
   const D = t.dataset;
   if (t.hasAttribute("data-close")) closeSheet();
@@ -480,6 +520,9 @@ document.addEventListener("click", e => {
   else if (D.th) { S.theme = D.th; applyTheme(); save(); document.querySelectorAll("#sheet [data-th]").forEach(b => b.classList.toggle("on", b.dataset.th === S.theme)); }
   else if (D.fs && t.closest("#sheet")) { S.fs = Math.min(48, Math.max(16, S.fs + +D.fs)); save(); const tx = $(".text"); if (tx) tx.style.setProperty("--fs", S.fs + "px"); const lb = t.parentElement.querySelector(".on"); if (lb) lb.textContent = S.fs; }
   else if (t.hasAttribute("data-home")) go({ v: "day", date: lastDay || iso(today()) });
+  else if (t.hasAttribute("data-hint")) { S.hintBm = true; save(); route.keep = true; render(); }
+  else if (t.hasAttribute("data-gobm")) { const el = $("#v" + S.bm.v); if (el) { el.scrollIntoView({ behavior: "smooth", block: "center" }); pulseVerse(S.bm.v, el); } }
+  else if (t.hasAttribute("data-bmclear")) { S.bm = null; save(); toast("הסימניה הוסרה"); route.keep = true; render(); }
   else if (t.hasAttribute("data-retry")) { delete txFail[CH[route.g].b]; render(); }
   else if (t.hasAttribute("data-join")) { S.from = Math.max(0, dayIdx(today())) * PER_DAY; save(); toast("מעכשיו נספרים רק פרקים מהיום והלאה"); route.keep = true; render(); }
   else if (t.hasAttribute("data-markall")) { if (confirm("לסמן את כל הפרקים עד היום כנלמדו?")) { const lim = Math.min(Math.max(0, dayIdx(today())), DAYS) * PER_DAY; for (let g = 0; g < Math.min(lim, TOTAL); g++) S.done[ck(g)] = 1; save(); route.keep = true; render(); } }
@@ -494,7 +537,7 @@ document.addEventListener("click", e => {
   else if (t.hasAttribute("data-today")) go({ v: "day", date: iso(today()) });
   else if (D.jump) go({ v: "day", date: iso(dateOfIdx(+D.jump)) });
   else if (D.book) go({ v: "book", b: +D.book });
-  else if (D.bm != null) { const v = +D.bm; if (bmAt(route.g, v)) { S.bm = null; toast("הסימניה הוסרה"); } else { S.bm = { k: ck(route.g), v }; toast(`סימניה: ${chName(route.g)} פסוק ${gem(v + 1)}`); } save(); route.keep = true; render(); }
+  else if (D.bm != null) { const v = +D.bm; if (bmAt(route.g, v)) { S.bm = null; toast("הסימניה הוסרה"); } else { S.bm = { k: ck(route.g), v }; toast(`🔖 סומן: עד כאן למדתי · פסוק ${gem(v + 1)}`); S.hintBm = true; } save(); route.keep = true; render(); }
   else if (t.hasAttribute("data-next") || t.hasAttribute("data-prev")) {
     const g = route.g + (t.hasAttribute("data-next") ? 1 : -1); if (g < 0 || g >= TOTAL) return;
     go({ v: "read", g }, true);
