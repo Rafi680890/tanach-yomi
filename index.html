@@ -50,8 +50,11 @@ svg{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColo
 .dy:disabled{opacity:.35;cursor:default}
 .weeknav{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:10px}
 .weeknav button{border:0;background:none;color:var(--accent);font-weight:800;font-size:15px;padding:8px 4px}
-.weeknav .td{border:2px solid var(--accent);border-radius:999px;padding:6px 22px;background:var(--accent);color:#fff}
-.weeknav .td.off{background:none;color:var(--mute);border:2px dashed var(--line);opacity:.8}
+.weeknav .td{border:2px solid var(--accent);border-radius:999px;padding:6px 22px;background:none;color:var(--accent)}
+.weeknav .td.on{background:var(--accent);color:var(--card);box-shadow:0 3px 10px rgba(20,48,90,.3)}
+.swrow{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;font-size:13px;color:var(--mute);font-weight:600}
+.sg{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;color:var(--ink)}
+.sg.on{background:var(--accent);border-color:var(--accent);color:var(--card)}
 .nav{display:flex;gap:8px;margin-top:14px;justify-content:center;flex-wrap:wrap}
 .nav button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:9px 18px;font-weight:600}
 .nav button.p{background:var(--accent);color:var(--card);border-color:var(--accent)}
@@ -437,7 +440,7 @@ function weekStrip(d, isToday) {
     const x = new Date(sun.getFullYear(), sun.getMonth(), sun.getDate() + k, 12), i = dayIdx(x), ok = i >= 0 && i < DAYS, id = iso(x), hd = hebOf(x).dt;
     cells += `<button class="dy ${id === route.date ? "sel" : ""} ${id === td ? "today" : ""}" ${ok ? `data-day="${id}"` : "disabled"} aria-label="יום ${DOW[k]} ${hd}">${DOW[k]}<b>${hd}</b></button>`;
   }
-  return `<div class="strip">${cells}</div><div class="weeknav"><button data-week="-1">› שבוע קודם</button><button class="td ${isToday ? "off" : ""}" data-today ${isToday ? "disabled" : ""}>היום</button><button data-week="1">שבוע הבא ‹</button></div>`;
+  return `<div class="strip">${cells}</div><div class="weeknav"><button data-week="-1">› שבוע קודם</button><button class="td ${isToday ? "on" : ""}" data-today ${isToday ? 'aria-current="date"' : ""}>היום</button><button data-week="1">שבוע הבא ‹</button></div><div class="swrow"><span>היום מתחלף:</span><button class="sg ${S.sunset !== false ? "on" : ""}" data-sunset="1">🌙 בשקיעה</button><button class="sg ${S.sunset === false ? "on" : ""}" data-sunset="0">🕛 בחצות</button></div>`;
 }
 function dateNav(d) {
   const cur = DL.find(x => x.iso === iso(d)) || DL[Math.max(0, Math.min(DAYS - 1, dayIdx(d)))];
@@ -601,7 +604,7 @@ function settingsHTML() {
 /* ---------- אירועים ---------- */
 document.addEventListener("click", e => {
   if (e.target.id === "ov") return closeSheet();
-  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk]");
+  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-sunset],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk]");
   if (!t) return;
   const D = t.dataset;
   if (t.hasAttribute("data-close")) closeSheet();
@@ -632,6 +635,7 @@ document.addEventListener("click", e => {
     const g = +D.toggle; if (isDone(g)) delete S.done[ck(g)]; else { S.done[ck(g)] = 1; toast("סומן כנלמד ✓"); }
     save(); route.keep = true; render();
   }
+  else if (D.sunset != null) { S.sunset = D.sunset === "1"; save(); checkDayRoll(); toast(S.sunset ? "היום מתחלף בשקיעה" : "היום מתחלף בחצות"); route.keep = true; render(); }
   else if (D.day) go({ v: "day", date: D.day });
   else if (D.week) { const i = Math.min(DAYS - 1, Math.max(0, dayIdx(parseISO(route.date)) + 7 * +D.week)); go({ v: "day", date: iso(dateOfIdx(i)) }); }
   else if (t.hasAttribute("data-today")) go({ v: "day", date: iso(today()) });
