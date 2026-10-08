@@ -218,7 +218,7 @@ const KEY = "tanachYomi.v1";
 const ck = g => B[CH[g].b].n + ":" + (CH[g].c + 1);          // מפתח יציב: "שמואל א:12"
 const KG = Object.create(null); CH.forEach((_, g) => KG[ck(g)] = g);
 const vcount = g => B[CH[g].b].c[CH[g].c];
-let S = { v: 2, done: {}, bm: null, hintBm: false, from: 0, fs: 26, taamim: true, theme: "light", cd: true, cz: true };
+let S = { v: 2, done: {}, bm: null, hintBm: false, from: 0, fs: 26, taamim: true, theme: "light", cd: true, cz: true, sunset: true };
 try {
   const raw = JSON.parse(localStorage.getItem(KEY) || "{}");
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw 0;
@@ -236,7 +236,7 @@ try {
   if (!(Number.isFinite(S.fs) && S.fs >= 16 && S.fs <= 48)) S.fs = 26;
   if (!["light", "sepia", "dark", "auto"].includes(S.theme)) S.theme = "light";
   if (!Number.isInteger(S.from) || S.from < 0) S.from = 0;
-  S.taamim = S.taamim !== false; S.cd = S.cd !== false; S.cz = S.cz !== false;
+  S.sunset = S.sunset !== false; S.taamim = S.taamim !== false; S.cd = S.cd !== false; S.cz = S.cz !== false;
 }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 const isDone = g => !!S.done[ck(g)];
@@ -268,7 +268,25 @@ const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())
 const parseISO = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d, 12); };
 const dayIdx = d => Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - START) / 864e5);
 const dateOfIdx = i => { const d = new Date(START); return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + i, 12); };
-const today = () => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate(), 12); };
+/* היום העברי מתחיל בשקיעה: אחרי השקיעה בירושלים "היום" הוא התאריך הבא. מחושב לפי שעון ירושלים, בלי תלות באזור הזמן של המכשיר. */
+const JER = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jerusalem", year: "numeric", month: "2-digit", day: "2-digit" });
+function sunsetMs(y, m, d, lat = 31.778, lon = 35.235) {          // m מ-0; אלגוריתם NOAA, מחזיר זמן UTC במילישניות
+  const R = Math.PI / 180, JD = Date.UTC(y, m, d, 12) / 864e5 + 2440587.5, T = (JD - 2451545) / 36525;
+  const L0 = (280.46646 + T * (36000.76983 + T * 0.0003032)) % 360, M = 357.52911 + T * (35999.05029 - 0.0001537 * T), e = 0.016708634 - T * (0.000042037 + 0.0000001267 * T);
+  const C = Math.sin(M * R) * (1.914602 - T * (0.004817 + 0.000014 * T)) + Math.sin(2 * M * R) * (0.019993 - 0.000101 * T) + Math.sin(3 * M * R) * 0.000289;
+  const om = 125.04 - 1934.136 * T, lam = L0 + C - 0.00569 - 0.00478 * Math.sin(om * R);
+  const e0 = 23 + (26 + (21.448 - T * (46.815 + T * (0.00059 - T * 0.001813))) / 60) / 60, eps = e0 + 0.00256 * Math.cos(om * R);
+  const dec = Math.asin(Math.sin(eps * R) * Math.sin(lam * R)), y2 = Math.tan(eps * R / 2) ** 2;
+  const eq = 4 * (y2 * Math.sin(2 * L0 * R) - 2 * e * Math.sin(M * R) + 4 * e * y2 * Math.sin(M * R) * Math.cos(2 * L0 * R) - 0.5 * y2 * y2 * Math.sin(4 * L0 * R) - 1.25 * e * e * Math.sin(2 * M * R)) / R;
+  const ha = Math.acos(Math.cos(90.833 * R) / (Math.cos(lat * R) * Math.cos(dec)) - Math.tan(lat * R) * Math.tan(dec)) / R;
+  return Date.UTC(y, m, d) + (720 - 4 * (lon - ha) - eq) * 60000;
+}
+let todayShifted = false;
+const today = () => {
+  const [y, m, d] = JER.format(new Date()).split("-").map(Number);
+  todayShifted = S.sunset !== false && Date.now() >= sunsetMs(y, m - 1, d);
+  return new Date(y, m - 1, d + (todayShifted ? 1 : 0), 12);
+};
 const $ = s => document.querySelector(s);
 const doneCount = () => Object.keys(S.done).filter(k => k in KG).length;
 function toast(t, act) {
@@ -291,12 +309,12 @@ let navBook = "", lastDay = null, lastHash = null;
 const urlOf = r => "#" + r.v + (r.date ? "/" + r.date : "") + (r.g != null ? "/" + r.g : "") + (r.b != null ? "/" + r.b : "");
 function go(r, replace) { route = r; history[replace ? "replaceState" : "pushState"](null, "", urlOf(r)); lastHash = location.hash; closeSheet(); render(); }
 function fromHash() {
-  if (location.hash === lastHash) return; lastHash = location.hash;
+  if (location.hash === lastHash) return; const first = lastHash === null; lastHash = location.hash;
   const [v, a] = location.hash.slice(1).split("/");
   if (v === "read" && CH[+a]) route = { v, g: +a };
   else if (v === "book" && B[+a]) route = { v, b: +a };
   else if (v === "progress") route = { v };
-  else route = { v: "day", date: /^\d{4}-\d\d-\d\d$/.test(a || "") ? a : iso(today()) };
+  else route = { v: "day", date: !first && /^\d{4}-\d\d-\d\d$/.test(a || "") ? a : iso(today()) };
   closeSheet(); render();
 }
 window.addEventListener("popstate", fromHash);
@@ -461,7 +479,7 @@ function dayView() {
   const pct = Math.round(doneCount() / TOTAL * 100);
   return `<div class="hero"><div class="htop"><div class="logo"><img src="logo.png" alt="קהילת אבני החושן"></div><div class="hded"><div><small>לעילוי נשמת</small><b>ר׳ אברהם בן ברכה</b></div><i></i><div><small>ולעילוי נשמת</small><b>חנה בת חג׳ילה</b></div><i></i><div><small>ולעילוי נשמת</small><b>שלום שלומי בן חנה</b></div></div></div><h1>תנ״ך <b>יומי</b></h1><p>שני פרקים בכל יום · מספר יהושע ועד דברי הימים</p><div class="orn">✦</div></div>
   <div class="card datecard"><div class="he">${hebFmt.format(d)}</div><div class="gr">${wdFmt.format(d)} · ${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}</div>
-  ${i >= 0 && i < DAYS ? `<span class="chip">יום ${i + 1} מתוך ${DAYS}</span>` : ""}
+  ${i >= 0 && i < DAYS ? `<span class="chip">יום ${i + 1} מתוך ${DAYS}</span>` : ""}${isToday && todayShifted ? `<div class="gr" style="margin-top:6px;font-size:14px">🌙 היום העברי החל בשקיעה</div>` : ""}
   ${weekStrip(d, isToday)}</div>
   ${bm}${body}${missed}
   <div class="card prog"><div class="ring" style="--p:${pct}"><i>${pct}%</i></div><div style="flex:1"><b style="font-size:18px">התקדמות כללית</b><div style="color:var(--mute);margin:2px 0 8px">${doneCount()} מתוך ${TOTAL} פרקים נלמדו</div><div class="bar"><i style="width:${pct}%"></i></div></div></div>
@@ -572,6 +590,7 @@ function settingsHTML() {
   return `<button class="x" data-close aria-label="סגור">✕</button><h3 class="sh" style="margin-top:4px">הגדרות תצוגה</h3>
   <div class="row"><span>גודל הכתב</span><div class="seg"><button data-fs="-2">א−</button><button class="on" disabled>${S.fs}</button><button data-fs="2">א+</button></div></div>
   <div class="row"><span>טעמי המקרא</span>${sw("taamim", S.taamim)}</div>
+  <div class="row"><span>היום מתחלף בשקיעה <small style="color:var(--mute)">(כמו התאריך העברי)</small></span>${sw("sunset", S.sunset)}</div>
   <div class="row"><span>פירוש מצודת דוד <i style="display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--hld);vertical-align:middle"></i></span>${sw("cd", S.cd)}</div>
   <div class="row"><span>פירוש מצודת ציון <i style="display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--hlz);vertical-align:middle"></i></span>${sw("cz", S.cz)}</div>
   <div style="margin-top:12px;font-weight:700">מצב תצוגה</div>
@@ -588,7 +607,7 @@ document.addEventListener("click", e => {
   if (t.hasAttribute("data-close")) closeSheet();
   else if (D.p) openPop(D.p);
   else if (t.hasAttribute("data-set")) openSheet(settingsHTML());
-  else if (D.sw) { S[D.sw] = !S[D.sw]; save(); t.classList.toggle("on", S[D.sw]); t.setAttribute("aria-checked", S[D.sw]); route.keep = true; render(); }
+  else if (D.sw) { S[D.sw] = !S[D.sw]; save(); if (D.sw === "sunset") checkDayRoll(); t.classList.toggle("on", S[D.sw]); t.setAttribute("aria-checked", S[D.sw]); route.keep = true; render(); }
   else if (D.th) { S.theme = D.th; applyTheme(); save(); document.querySelectorAll("#sheet [data-th]").forEach(b => b.classList.toggle("on", b.dataset.th === S.theme)); }
   else if (D.fs && t.closest("#sheet")) { S.fs = Math.min(48, Math.max(16, S.fs + +D.fs)); save(); const tx = $(".text"); if (tx) tx.style.setProperty("--fs", S.fs + "px"); const lb = t.parentElement.querySelector(".on"); if (lb) lb.textContent = S.fs; }
   else if (t.hasAttribute("data-home")) go({ v: "day", date: lastDay || iso(today()) });
@@ -673,12 +692,19 @@ document.addEventListener("change", e => {
   go({ v: "day", date: hit.iso });
 });
 let shownToday = iso(today());
-document.addEventListener("visibilitychange", () => {          // אפליקציה שנשארה פתוחה ברקע ועברה יום
-  if (document.visibilityState !== "visible") return;
+function checkDayRoll() {                                            // עבר יום (או שקיעה) בזמן שהאפליקציה פתוחה
   const t = iso(today()); if (t === shownToday) return;
   const wasToday = route.v === "day" && route.date === shownToday; shownToday = t;
-  if (wasToday) go({ v: "day", date: t }, true); else { route.keep = true; render(); }
+  if (wasToday) go({ v: "day", date: t }, true); else if (route.v === "day") { route.keep = true; render(); }
+}
+let hiddenAt = 0;
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") { hiddenAt = Date.now(); return; }
+  if (hiddenAt && Date.now() - hiddenAt > 3 * 3600e3 && route.v === "day" && route.date !== iso(today())) go({ v: "day", date: iso(today()) }, true);   // חזרה אחרי זמן רב - מתחילים מהיום
+  checkDayRoll();
 });
+window.addEventListener("pageshow", checkDayRoll); window.addEventListener("focus", checkDayRoll);
+setInterval(checkDayRoll, 30000);
 fromHash();
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(err => console.error("SW registration failed:", err));
 </script>
