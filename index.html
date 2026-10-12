@@ -465,7 +465,7 @@ function dayView() {
   else if (i >= DAYS) body = `<div class="card">🎉 סיימנו את כל הנביאים והכתובים. חזק וברוך!</div>`;
   else for (let k = 0; k < PER_DAY; k++) {
     const g = i * PER_DAY + k; if (g >= TOTAL) break;
-    const done = isDone(g), hasBm = bmAt(g), bm = hasBm ? `🔖 עצרת בפסוק ${gem(S.bm.v + 1)} מתוך ${gem(vcount(g))}` : `${vcount(g)} פסוקים`;
+    const done = isDone(g), hasBm = bmAt(g), bm = hasBm ? `🔖 המשך מפסוק ${gem(S.bm.v + 1)} מתוך ${gem(vcount(g))}` : `${vcount(g)} פסוקים`;
     body += `<div class="card chap ${done ? "done" : ""}" style="--cc:var(${GROUPS[groupOf(CH[g].b)][3]})"><div class="t"><small>${GROUPS[groupOf(CH[g].b)][0]}</small><b>${chName(g)}</b><span>${bm}</span>${resLinks(g, true)}</div>
       <div class="btns"><button class="btn read" data-read="${g}"${hasBm ? ` data-v="${S.bm.v}" data-resume` : ""}><span class="ic">${I.openbook}</span>${hasBm ? "המשך מפסוק " + gem(S.bm.v + 1) : "לקריאה"}</button><button class="btn chk ${done ? "on" : ""}" data-toggle="${g}">${I.check} ${done ? "למדתי" : "סמן כנלמד"}</button></div></div>`;
   }
@@ -545,13 +545,13 @@ function readView() {
   POP = [];
   let t = ""; vs.forEach((v, i) => {
     const pb = v.endsWith("\n");
-    t += `<span class="v ${markV(g) === i ? "bm" : ""} ${route.pulseV === i && Date.now() < route.pulseUntil ? "pulse" : ""}" id="v${i}"><button class="vn ${bmAt(g, i) ? "on" : ""}" data-bm="${i}" aria-pressed="${bmAt(g, i)}" aria-label="סימניה: עד כאן למדתי, פסוק ${gem(i + 1)}">${gem(i + 1)}${BMI}</button>${verseHTML(v, i, g, j)}</span>${pb ? '<span class="pb"></span>' : ""}`;
     if (markV(g) === i) t += bmAt(g, i) ? `<div class="bmline" id="bmline"><span>🔖 עד כאן למדתי</span><button data-bmclear>הסר</button></div>` : `<div class="bmline" id="bmline"><span>🔖 כאן עצרת בפעם הקודמת</span></div>`;
+    t += `<span class="v ${markV(g) === i ? "bm" : ""} ${route.pulseV === i && Date.now() < route.pulseUntil ? "pulse" : ""}" id="v${i}"><button class="vn ${bmAt(g, i) ? "on" : ""}" data-bm="${i}" aria-pressed="${bmAt(g, i)}" aria-label="סימניה: עד כאן למדתי, לפני פסוק ${gem(i + 1)}">${gem(i + 1)}${BMI}</button>${verseHTML(v, i, g, j)}</span>${pb ? '<span class="pb"></span>' : ""}`;
   });
   const done = isDone(g), nx = g + 1 < TOTAL ? chName(g + 1) : "", pv = g > 0 ? chName(g - 1) : "";
   const legend = ((S.cd || S.cz) ? `<div class="legend">${S.cd ? '<span><i style="background:var(--hld)"></i>מצודת דוד</span>' : ""}${S.cz ? '<span><i style="background:var(--hlz)"></i>מצודת ציון</span>' : ""}<span>· לחצו על מילה מסומנת לפירוש</span></div>` : "")
-    + `<div class="legend"><span style="color:var(--bmc);font-weight:700">${BMI.replace("<svg", '<svg style="width:15px;height:15px;stroke:currentColor;fill:none"')} לחצו על מספר פסוק כדי לסמן עד היכן למדתם</span></div>`;
-  const hint = !S.hintBm && !S.bm ? `<div class="hint"><div>💡 <b>למדתם עד כאן?</b> לחצו על מספר הפסוק (עם סימן הסימניה) כדי לסמן. בפעם הבאה תמשיכו בדיוק משם.</div><button data-hint>הבנתי</button></div>` : "";
+    + `<div class="legend"><span style="color:var(--bmc);font-weight:700">${BMI.replace("<svg", '<svg style="width:15px;height:15px;stroke:currentColor;fill:none"')} עצרתם? לחצו על מספר הפסוק הבא (שעוד לא קראתם) לסימון עד היכן למדתם</span></div>`;
+  const hint = !S.hintBm && !S.bm ? `<div class="hint"><div>💡 <b>עצרתם?</b> לחצו על מספר <b>הפסוק הבא</b> שעוד לא קראתם (עם סימן הסימניה). הקו יסמן עד היכן למדתם, ובפעם הבאה תמשיכו בדיוק משם.</div><button data-hint>הבנתי</button></div>` : "";
   
   return `<header class="rh"><button class="home" data-home>${I.home}<span>חזרה לדף הבית</span></button><div class="rt">${chName(g)}</div><button class="gear" data-set aria-label="הגדרות תצוגה">Aa</button></header>
   ${resLinks(g)}${legend}${hint}<div class="text" style="--fs:${S.fs}px">${t}</div>${footer(true)}
@@ -641,7 +641,7 @@ document.addEventListener("click", e => {
   else if (t.hasAttribute("data-today")) go({ v: "day", date: iso(today()) });
   else if (D.jump) go({ v: "day", date: iso(dateOfIdx(+D.jump)) });
   else if (D.book) go({ v: "book", b: +D.book });
-  else if (D.bm != null) { const v = +D.bm; if (bmAt(route.g, v)) { S.bm = null; toast("הסימניה הוסרה"); } else { S.bm = { k: ck(route.g), v }; route.resume = null; toast(`🔖 סומן: עד כאן למדתי · פסוק ${gem(v + 1)}`); S.hintBm = true; } save(); route.keep = true; render(); }
+  else if (D.bm != null) { const v = +D.bm; if (bmAt(route.g, v)) { S.bm = null; toast("הסימניה הוסרה"); } else { S.bm = { k: ck(route.g), v }; route.resume = null; toast(`🔖 סומן: עד כאן למדתי, לפני פסוק ${gem(v + 1)}`); S.hintBm = true; } save(); route.keep = true; render(); }
   else if (t.hasAttribute("data-next") || t.hasAttribute("data-prev")) {
     const g = route.g + (t.hasAttribute("data-next") ? 1 : -1); if (g < 0 || g >= TOTAL) return;
     go({ v: "read", g }, true);
