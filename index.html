@@ -575,13 +575,13 @@ function render() {
 let prevFocus = null;
 function closeSheet() {
   const ov = $("#ov"), was = ov.classList.contains("show");
-  ov.classList.remove("show"); document.body.style.overflow = ""; $("#app").removeAttribute("aria-hidden");
-  if (was && prevFocus && document.contains(prevFocus)) prevFocus.focus();
+  ov.classList.remove("show"); document.body.style.overflow = ""; $("#app").removeAttribute("aria-hidden"); $("#app").removeAttribute("inert");
+  if (was) { if (prevFocus && document.contains(prevFocus)) prevFocus.focus(); else { const gb = $("[data-set]"); if (gb) gb.focus(); } }
   prevFocus = null;
 }
 function openSheet(html) {
   const ov = $("#ov"); if (!ov.classList.contains("show")) prevFocus = document.activeElement;
-  $("#sheet").innerHTML = html; ov.classList.add("show"); document.body.style.overflow = "hidden"; $("#app").setAttribute("aria-hidden", "true");
+  $("#sheet").innerHTML = html; ov.classList.add("show"); document.body.style.overflow = "hidden"; $("#app").setAttribute("aria-hidden", "true"); $("#app").setAttribute("inert", "");
   ($("#sheet .x") || $("#sheet")).focus();
 }
 function openPop(ids) {
