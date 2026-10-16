@@ -169,6 +169,9 @@ select{width:100%;height:46px;border:1px solid var(--line);background:var(--card
 .selbar b{flex-basis:100%;font-size:15px}
 .selbar button{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:9px 12px;font-weight:700;font-size:14px}
 .selbar button.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.ver{font-size:12px;color:var(--mute);margin-top:12px;font-weight:700}
+.refbtn{display:block;margin:8px auto 0;border:2px solid var(--accent);background:var(--card);color:var(--accent);border-radius:12px;padding:10px 18px;font-weight:800;font-size:15px}
+.vernote{font-size:12px;color:var(--mute);margin-top:6px;line-height:1.4}
 .sharecard{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,var(--card),rgba(37,160,100,.12));border:2px solid #25a064}
 .sharecard .tx{flex:1;min-width:150px}.sharecard .tx b{display:block;font-size:19px;color:var(--accent)}.sharecard .tx span{font-size:14px;color:var(--mute)}
 .sharecard .go{border:0;background:#25a064;color:#fff;border-radius:12px;padding:13px 16px;font-weight:800;font-size:17px;width:100%}
@@ -332,6 +335,7 @@ const I = {
 /* ---------- ניתוב ---------- */
 let route = { v: "day", date: iso(today()) };
 let navBook = "", lastDay = null, lastHash = null, booted = false, navIdx = 0, navMax = 0;
+try { if (/[?&]r=\d+/.test(location.search)) history.replaceState(history.state, "", location.pathname + location.hash); } catch (e) {}
 if (history.state && Number.isInteger(history.state.i)) navIdx = navMax = history.state.i; else try { history.replaceState({ i: 0 }, ""); } catch (e) {}
 const urlOf = r => "#" + r.v + (r.date ? "/" + r.date : "") + (r.g != null ? "/" + r.g : "") + (r.b != null ? "/" + r.b : "");
 function go(r, replace) {
@@ -458,9 +462,19 @@ const installHelpHTML = () => `<button class="x" data-close aria-label="סגור
 <ol class="help-steps"><li>בהודעה לחצו על <b>״פרטים נוספים״</b> ואז על <b>״התקן בכל זאת״</b>.</li>
 <li>אם אין כפתור כזה: ב-Chrome פתחו את התפריט ⋮ ובחרו <b>״הוסף למסך הבית״</b>, ואז <b>״צור קיצור דרך״</b> (לא ״התקן״). האייקון יופיע במסך הבית ויעבוד כרגיל.</li>
 <li>או פשוט המשיכו להשתמש באתר דרך הדפדפן, בלי להתקין.</li></ol>`;
+const APP_VERSION = "2026.10.16";
+async function hardRefresh() {                                      // מוחק רק את קבצי האפליקציה השמורים (מטמון), לא את ההתקדמות
+  if (!navigator.onLine) { toast("צריך חיבור לאינטרנט כדי לרענן"); return; }
+  toast("מרענן לגרסה החדשה…");
+  try {
+    if (navigator.serviceWorker) { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r => r.unregister())); }
+    if (window.caches) { const ks = await caches.keys(); await Promise.all(ks.map(k => caches.delete(k))); }
+  } catch (e) {}
+  location.replace(location.pathname + "?r=" + Date.now() + location.hash);
+}
 const MAM_SRC = "https://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%AA%D7%9E%D7%A9:Dovi/%D7%9E%D7%A7%D7%A8%D7%90_%D7%A2%D7%9C_%D7%A4%D7%99_%D7%94%D7%9E%D7%A1%D7%95%D7%A8%D7%94";
 function footer(src) {
-  return `<footer class="ft"><div class="cp">© רפאל בטיט · כל הזכויות שמורות על עיצוב ופיתוח האפליקציה</div>${src ? `<div class="src">נוסח המקרא: <a href="${MAM_SRC}" target="_blank" rel="noopener">מקרא על פי המסורה (MAM)</a>, ברישיון CC-BY-SA, באמצעות ספריא. בתצוגה זו הוצג הקרי בלבד במקום כתיב וקרי, הוסרו סימוני פתוחות וסתומות, וטעמי המקרא ניתנים להסתרה. פירושי מצודת דוד ומצודת ציון: נחלת הכלל. קישורי שמע ולימוד: הרב מוטי פרנקו (Spotify) וישיבת הר עציון.</div>` : ""}</footer>`;
+  return `<footer class="ft"><div class="cp">© רפאל בטיט · כל הזכויות שמורות על עיצוב ופיתוח האפליקציה</div><div class="ver">גרסה ${APP_VERSION}</div><button class="refbtn" data-refresh>🔄 ריענון לגירסה חדשה</button><div class="vernote">הריענון מוריד את הגרסה העדכנית. ההתקדמות והסימניות שלך נשמרות.</div>${src ? `<div class="src">נוסח המקרא: <a href="${MAM_SRC}" target="_blank" rel="noopener">מקרא על פי המסורה (MAM)</a>, ברישיון CC-BY-SA, באמצעות ספריא. בתצוגה זו הוצג הקרי בלבד במקום כתיב וקרי, הוסרו סימוני פתוחות וסתומות, וטעמי המקרא ניתנים להסתרה. פירושי מצודת דוד ומצודת ציון: נחלת הכלל. קישורי שמע ולימוד: הרב מוטי פרנקו (Spotify) וישיבת הר עציון.</div>` : ""}</footer>`;
 }
 function tabs() {
   const on = route.v === "progress" || route.v === "book" ? "p" : "d", pct = Math.round(doneCount() / TOTAL * 100);
@@ -647,7 +661,7 @@ function settingsHTML() {
 /* ---------- אירועים ---------- */
 document.addEventListener("click", e => {
   if (e.target.id === "ov") return closeSheet();
-  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-sunset],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk],[data-navback],[data-navfwd],[data-bookall],[data-selmode],[data-pick],[data-selact]");
+  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-sunset],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk],[data-navback],[data-navfwd],[data-refresh],[data-bookall],[data-selmode],[data-pick],[data-selact]");
   if (!t) return;
   const D = t.dataset;
   if (t.hasAttribute("data-close")) closeSheet();
@@ -656,6 +670,7 @@ document.addEventListener("click", e => {
   else if (D.sw) { S[D.sw] = !S[D.sw]; save(); if (D.sw === "sunset") checkDayRoll(); t.classList.toggle("on", S[D.sw]); t.setAttribute("aria-checked", S[D.sw]); route.keep = true; render(); }
   else if (D.th) { S.theme = D.th; applyTheme(); save(); document.querySelectorAll("#sheet [data-th]").forEach(b => b.classList.toggle("on", b.dataset.th === S.theme)); }
   else if (D.fs && t.closest("#sheet")) { S.fs = Math.min(48, Math.max(16, S.fs + +D.fs)); save(); const tx = $(".text"); if (tx) tx.style.setProperty("--fs", S.fs + "px"); const lb = t.parentElement.querySelector(".on"); if (lb) lb.textContent = S.fs; }
+  else if (t.hasAttribute("data-refresh")) hardRefresh();
   else if (t.hasAttribute("data-navback")) { if (navIdx > 0) history.back(); }
   else if (t.hasAttribute("data-navfwd")) { if (navIdx < navMax) history.forward(); }
   else if (D.bookall != null) {
