@@ -22,54 +22,54 @@ button,select,input{font:inherit;color:inherit}button{cursor:pointer}
 svg{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #app{max-width:720px;margin:0 auto;padding:0 14px calc(104px + env(safe-area-inset-bottom))}
 /* hero */
-.hero{margin:0 -14px;padding:calc(22px + env(safe-area-inset-top)) 18px 70px;text-align:center;color:#fff;border-radius:0 0 34px 34px;
+.hero{margin:0 -14px;padding:calc(14px + env(safe-area-inset-top)) 18px 48px;text-align:center;color:#fff;border-radius:0 0 34px 34px;
  background:radial-gradient(circle at 15% 10%,rgba(217,164,65,.35),transparent 45%),radial-gradient(circle at 90% 90%,rgba(255,255,255,.12),transparent 40%),linear-gradient(160deg,var(--hero1),var(--hero2) 60%,var(--hero3))}
 .logo{display:inline-block;background:#fff;border-radius:18px;padding:8px 14px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
 .logo img{display:block;height:72px;width:auto}
-.hero h1{margin:16px 0 2px;font-size:38px;font-weight:800;letter-spacing:.5px}
+.hero h1{margin:8px 0 0;font-size:31px;font-weight:800;letter-spacing:.5px}
 .hero h1 b{color:var(--gold)}
-.hero p{margin:0;opacity:.9;font-size:15px}
+.hero p{margin:0;opacity:.9;font-size:14px}
 .htop{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.hded{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 12px;border:1px solid rgba(217,164,65,.55);border-radius:14px;background:rgba(255,255,255,.08);text-align:center}
+.hded{display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 14px;border:1px solid rgba(217,164,65,.55);border-radius:14px;background:rgba(255,255,255,.08);text-align:center}
 .hded div{line-height:1.25}
 .hded i{width:26px;height:1px;background:var(--gold);opacity:.8}
-.hded small{display:block;color:var(--gold);font-size:10.5px;font-weight:700;letter-spacing:.6px}
-.hded b{display:block;font-size:13px;font-weight:700;color:#fff}
-.orn{display:flex;align-items:center;gap:10px;justify-content:center;color:var(--gold);margin:10px auto 0;max-width:260px}
+.hded small{display:block;color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.6px}
+.hded b{display:block;font-size:15px;font-weight:700;color:#fff}
+.orn{display:flex;align-items:center;gap:10px;justify-content:center;color:var(--gold);margin:6px auto 0;max-width:260px}
 .orn:before,.orn:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
 .orn:after{transform:scaleX(-1)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin:14px 0;box-shadow:0 2px 10px rgba(20,48,90,.06)}
-.datecard{margin-top:-46px;text-align:center;position:relative;padding:18px 12px 16px}
-.datecard .he{font-size:30px;font-weight:800;color:var(--accent);line-height:1.2}
-.datecard .gr{font-size:17px;color:var(--mute);margin-top:4px}
-.chip{display:inline-block;margin-top:10px;background:linear-gradient(90deg,var(--c2),var(--c3));color:#fff;border-radius:999px;padding:4px 14px;font-size:14px;font-weight:600}
-.strip{display:flex;gap:6px;margin-top:12px}
-.dy{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:7px 0 8px;font-size:13px;color:var(--mute);line-height:1.2;font-weight:600}
-.dy b{display:block;font-size:17px;color:var(--ink);margin-top:2px;font-weight:800}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin:10px 0;box-shadow:0 2px 10px rgba(20,48,90,.06)}
+.datecard{margin-top:-34px;text-align:center;position:relative;padding:12px 12px 12px}
+.datecard .he{font-size:26px;font-weight:800;color:var(--accent);line-height:1.2}
+.datecard .gr{font-size:15px;color:var(--mute);margin-top:2px}
+.chip{display:inline-block;margin-top:6px;background:linear-gradient(90deg,var(--c2),var(--c3));color:#fff;border-radius:999px;padding:4px 14px;font-size:14px;font-weight:600}
+.strip{display:flex;gap:5px;margin-top:8px}
+.dy{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:4px 0 5px;font-size:12px;color:var(--mute);line-height:1.15;font-weight:600}
+.dy b{display:block;font-size:15px;color:var(--ink);margin-top:2px;font-weight:800}
 .dy.sel{background:var(--accent);border-color:var(--accent);color:#cfe0f5}.dy.sel b{color:#fff}
 .dy.today{box-shadow:inset 0 -4px 0 var(--gold)}
 .dy:disabled{opacity:.35;cursor:default}
-.weeknav{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:10px}
+.weeknav{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:6px}
 .weeknav button{border:0;background:none;color:var(--accent);font-weight:800;font-size:15px;padding:8px 4px}
-.weeknav .td{border:2px solid var(--accent);border-radius:999px;padding:6px 22px;background:none;color:var(--accent)}
+.weeknav .td{border:2px solid var(--accent);border-radius:999px;padding:4px 20px;background:none;color:var(--accent)}
 .weeknav .td.on{background:var(--accent);color:var(--card);box-shadow:0 3px 10px rgba(20,48,90,.3)}
-.swrow{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;font-size:13px;color:var(--mute);font-weight:600}
+.swrow{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;font-size:13px;color:var(--mute);font-weight:600}
 .sg{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;color:var(--ink)}
 .sg.on{background:var(--accent);border-color:var(--accent);color:var(--card)}
 .nav{display:flex;gap:8px;margin-top:14px;justify-content:center;flex-wrap:wrap}
 .nav button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:9px 18px;font-weight:600}
 .nav button.p{background:var(--accent);color:var(--card);border-color:var(--accent)}
 /* chapter cards */
-.chap{display:flex;align-items:center;gap:12px;padding:14px 22px 14px 14px;position:relative;overflow:hidden}
+.chap{display:flex;align-items:center;gap:10px;padding:10px 20px 10px 12px;position:relative;overflow:hidden}
 .chap:before{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:9px;background:linear-gradient(180deg,var(--hero1),var(--hero2) 60%,var(--hero3))}
 .chap .t{flex:1}
 .chap .t small{color:var(--cc);font-weight:700;font-size:14px}
-.chap .t b{font-size:26px;display:block;line-height:1.2}
+.chap .t b{font-size:23px;display:block;line-height:1.15}
 .chap .t span{font-size:14px;color:var(--mute)}
-.chap .btns{display:flex;flex-direction:column;gap:8px}
-.btn{border:0;border-radius:12px;padding:10px 16px;font-weight:700;white-space:nowrap}
-.btn.read{background:linear-gradient(135deg,var(--hero1),var(--hero2) 65%,var(--hero3));color:#fff;font-size:18px;font-weight:800;padding:8px 18px 8px 12px;display:flex;align-items:center;gap:9px;box-shadow:0 5px 14px rgba(16,41,80,.35)}
-.btn.read .ic{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;flex:none}
+.chap .btns{display:flex;flex-direction:column;gap:6px}
+.btn{border:0;border-radius:12px;padding:7px 14px;font-weight:700;white-space:nowrap}
+.btn.read{background:linear-gradient(135deg,var(--hero1),var(--hero2) 65%,var(--hero3));color:#fff;font-size:17px;font-weight:800;padding:6px 16px 6px 10px;display:flex;align-items:center;gap:9px;box-shadow:0 5px 14px rgba(16,41,80,.35)}
+.btn.read .ic{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;flex:none}
 .btn.read .ic svg{width:20px;height:20px;stroke-width:2.2}
 .btn.read:active{transform:scale(.97)}
 .btn.chk{background:var(--bg);border:2px solid var(--line);color:var(--mute)}
@@ -172,10 +172,19 @@ select{width:100%;height:46px;border:1px solid var(--line);background:var(--card
 .ver{font-size:12px;color:var(--mute);margin-top:12px;font-weight:700}
 .refbtn{display:block;margin:8px auto 0;border:2px solid var(--accent);background:var(--card);color:var(--accent);border-radius:12px;padding:10px 18px;font-weight:800;font-size:15px}
 .vernote{font-size:12px;color:var(--mute);margin-top:6px;line-height:1.4}
-.sharecard{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,var(--card),rgba(37,160,100,.12));border:2px solid #25a064}
-.sharecard .tx{flex:1;min-width:150px}.sharecard .tx b{display:block;font-size:19px;color:var(--accent)}.sharecard .tx span{font-size:14px;color:var(--mute)}
-.sharecard .go{border:0;background:#25a064;color:#fff;border-radius:12px;padding:13px 16px;font-weight:800;font-size:17px;width:100%}
-.sharecard .help{border:0;background:none;color:var(--mute);text-decoration:underline;font-size:13px;width:100%;padding:0}
+.sharecard{border:2px solid var(--line);padding:13px;margin:10px 0}
+.sharecard .shh{display:flex;align-items:center;gap:8px;font-weight:800;font-size:18px;color:var(--ink);margin:0 0 4px}
+.sharecard .shh svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.sharecard .shs{font-size:13px;color:var(--mute);margin:0 0 10px}
+.sharecard .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sharecard .sb{display:flex;align-items:center;justify-content:center;gap:9px;border:0;border-radius:999px;padding:10px 10px;color:#fff;font-weight:800;font-size:16px;transition:transform .12s}
+.sharecard .sb:active{transform:scale(.96)}
+.sharecard .sb svg{width:22px;height:22px;fill:currentColor;flex:none}
+.sharecard .sb.cp svg{fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.sharecard .wa{background:#2f9e44}.sharecard .fb{background:#1877d2}.sharecard .tg{background:#12a0a8}.sharecard .cp{background:#5b2fa3}
+.sharecard .more{margin-top:8px;width:100%;display:flex;align-items:center;justify-content:center;gap:9px;background:transparent;color:var(--accent);border:2px solid var(--accent);border-radius:999px;padding:9px;font-weight:800;font-size:16px}
+.sharecard .more svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sharecard .help{display:block;margin:8px auto 0;border:0;background:none;color:var(--mute);text-decoration:underline;font-size:13px;padding:0}
 .help-steps{font-size:16px;line-height:1.7}.help-steps li{margin-bottom:8px}.help-steps b{color:var(--accent)}
 .bmcard{flex-wrap:wrap}
 .bmcard .go{border:0;background:var(--bmc);color:#fff;border-radius:12px;padding:13px 14px;font-weight:800;font-size:17px;width:100%}
@@ -451,18 +460,34 @@ function resLinks(g, compact) {
 }
 const SHARE_URL = "https://rafi680890.github.io/tanach-yomi/";
 const SHARE_TEXT = "📖 תנ״ך יומי: שני פרקים בכל יום, מיהושע ועד דברי הימים - עם ניקוד, טעמי מקרא ופירוש מצודת דוד ומצודת ציון.";
-async function shareApp() {
+async function shareApp(kind) {
+  const full = SHARE_TEXT + " " + SHARE_URL, e = encodeURIComponent;
+  if (kind === "wa") { window.open("https://wa.me/?text=" + e(full), "_blank", "noopener"); return; }
+  if (kind === "fb") { window.open("https://www.facebook.com/sharer/sharer.php?u=" + e(SHARE_URL), "_blank", "noopener"); return; }
+  if (kind === "tg") { window.open("https://t.me/share/url?url=" + e(SHARE_URL) + "&text=" + e(SHARE_TEXT), "_blank", "noopener"); return; }
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(full); }
+    catch (er) { const t = document.createElement("textarea"); t.value = full; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); } catch (e2) {} t.remove(); }
+    toast("הקישור הועתק ✓");
+  };
+  if (kind === "copy") { await copy(); return; }
   try { if (navigator.share) { await navigator.share({ title: "תנ״ך יומי", text: SHARE_TEXT, url: SHARE_URL }); return; } }
-  catch (e) { if (e && e.name === "AbortError") return; }
-  window.open("https://wa.me/?text=" + encodeURIComponent(SHARE_TEXT + " " + SHARE_URL), "_blank", "noopener");
+  catch (er) { if (er && er.name === "AbortError") return; }
+  await copy();
 }
-const shareCard = () => `<div class="card sharecard"><div class="tx"><b>📤 שתפו עם חברים ומשפחה</b><span>לחיצה אחת - ווטסאפ והודעות, עם הקישור והסבר קצר</span></div><button class="go" data-share>שתפו את האפליקציה</button><button class="help" data-installhelp>מופיעה אזהרה בהתקנה באנדרואיד? לחצו כאן</button></div>`;
+const shareCard = () => `<div class="card sharecard"><div class="shh"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg>שתפו עם חברים ומשפחה</div><p class="shs">הקישור יישלח עם הסבר קצר על האפליקציה</p><div class="sgrid">
+<button class="sb wa" data-share="wa"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.2 14c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.4.1.6-.1l.8-1c.2-.2.3-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.8-.1 1.3z"/></svg>ווטסאפ</button>
+<button class="sb fb" data-share="fb"><svg viewBox="0 0 24 24"><path d="M13.5 22v-8.2h2.8l.5-3.3h-3.3V8.4c0-1 .4-1.7 1.8-1.7H17V3.800C16.700 3.700 15.700 3.600 14.600 3.600c-2.500 0-4.100 1.500-4.100 4.200v2.700H7.700v3.300h2.800V22z"/></svg>פייסבוק</button>
+<button class="sb tg" data-share="tg"><svg viewBox="0 0 24 24"><path d="M21.500 3.500 2.700 10.800c-.9.300-.9 1.200 0 1.500l4.800 1.500 1.800 5.700c.2.600.9.800 1.400.4l2.600-2.200 4.700 3.500c.6.400 1.300.1 1.500-.6l3.200-15.200c.2-.9-.6-1.600-1.200-1.400zM9.700 14.300l8.200-5.100-6.500 6.200-.3 3.100z"/></svg>טלגרם</button>
+<button class="sb cp" data-share="copy"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.700 0l3-3a4 4 0 0 0-5.700-5.700l-1 1"/><path d="M14 10a4 4 0 0 0-5.700 0l-3 3A4 4 0 0 0 11 18.700l1-1"/></svg>העתקת קישור</button></div>
+<button class="more" data-share="more"><svg viewBox="0 0 24 24"><path d="M12 15V3M7.500 7.500 12 3l4.500 4.500"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>שתפו באפשרויות נוספות</button>
+<button class="help" data-installhelp>מופיעה אזהרה בהתקנה באנדרואיד? לחצו כאן</button></div>`;
 const installHelpHTML = () => `<button class="x" data-close aria-label="סגור">✕</button><h3 class="sh" style="margin-top:4px">בעיה בהתקנה באנדרואיד</h3>
 <p style="margin:0 0 10px">אם מופיעה הודעה <b>״Google Play Protect: אפליקציה לא בטוחה נחסמה״</b> - זו אזהרה כללית של אנדרואיד על אפליקציות אינטרנט, והאפליקציה עצמה בטוחה (היא אתר, בלי קבצים מסוכנים). אפשר להמשיך כך:</p>
 <ol class="help-steps"><li>בהודעה לחצו על <b>״פרטים נוספים״</b> ואז על <b>״התקן בכל זאת״</b>.</li>
 <li>אם אין כפתור כזה: ב-Chrome פתחו את התפריט ⋮ ובחרו <b>״הוסף למסך הבית״</b>, ואז <b>״צור קיצור דרך״</b> (לא ״התקן״). האייקון יופיע במסך הבית ויעבוד כרגיל.</li>
 <li>או פשוט המשיכו להשתמש באתר דרך הדפדפן, בלי להתקין.</li></ol>`;
-const APP_VERSION = "2026.10.16";
+const APP_VERSION = "2026.10.25";
 async function hardRefresh() {                                      // מוחק רק את קבצי האפליקציה השמורים (מטמון), לא את ההתקדמות
   if (!navigator.onLine) { toast("צריך חיבור לאינטרנט כדי לרענן"); return; }
   toast("מרענן לגרסה החדשה…");
@@ -694,7 +719,7 @@ document.addEventListener("click", e => {
     route.keep = true; render();
   }
   else if (t.hasAttribute("data-home")) go({ v: "day", date: lastDay || iso(today()) });
-  else if (t.hasAttribute("data-share")) shareApp();
+  else if (t.hasAttribute("data-share")) shareApp(t.getAttribute("data-share"));
   else if (t.hasAttribute("data-installhelp")) openSheet(installHelpHTML());
   else if (t.hasAttribute("data-hint")) { S.hintBm = true; save(); route.keep = true; render(); }
   else if (t.hasAttribute("data-bmclear")) { S.bm = null; save(); toast("הסימניה הוסרה"); route.keep = true; render(); }
