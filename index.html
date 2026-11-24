@@ -185,6 +185,17 @@ select{width:100%;height:46px;border:1px solid var(--line);background:var(--card
 .refbtn{display:block;margin:8px auto 0;border:2px solid var(--accent);background:var(--card);color:var(--accent);border-radius:12px;padding:10px 18px;font-weight:800;font-size:15px}
 .offbtn{display:block;margin:12px auto 0;border:2px solid var(--ok);background:var(--card);color:var(--ok);border-radius:12px;padding:10px 18px;font-weight:800;font-size:15px}
 .offbtn:disabled{opacity:.6}
+.sq{width:100%;box-sizing:border-box;height:48px;border:2px solid var(--line);background:var(--card);border-radius:14px;padding:0 14px;font-size:18px;color:var(--ink);font-family:inherit}
+.sq:focus{outline:none;border-color:var(--accent)}
+.sopts{display:flex;gap:8px;align-items:center;margin:10px 0 4px;flex-wrap:wrap;font-size:14px;color:var(--mute)}
+.sopts select{height:38px;font-size:15px;width:auto;flex:1;min-width:130px}
+.sopts label{display:flex;align-items:center;gap:6px;font-weight:600;cursor:pointer}
+.ssum{font-size:14px;color:var(--mute);margin:10px 4px 6px;font-weight:700}
+.sres{display:block;width:100%;text-align:right;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:6px 0;color:var(--ink);font-family:inherit}
+.sres .sref{font-size:13px;font-weight:800;color:var(--accent);margin-bottom:4px}
+.sres .stx{font-family:"TanachFont",serif;font-size:21px;line-height:1.75;direction:rtl}
+mark.hit{background:var(--mark);color:inherit;border-radius:5px;padding:0 2px}
+.smore{display:block;margin:10px auto;border:2px solid var(--accent);background:var(--card);color:var(--accent);border-radius:999px;padding:10px 24px;font-weight:800;font-size:15px}
 .vernote{font-size:12px;color:var(--mute);margin-top:6px;line-height:1.4}
 .sharecard{border:2px solid var(--line);padding:13px;margin:10px 0}
 .sharecard .shh{display:flex;align-items:center;gap:8px;font-weight:800;font-size:18px;color:var(--ink);margin:0 0 4px}
@@ -533,6 +544,7 @@ const I = {
   chart: '<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>',
   cal: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
   openbook: '<svg viewBox="0 0 24 24"><path d="M12 6.5C9.8 5 7 4.5 3.5 4.5v13c3.5 0 6.3.5 8.5 2 2.2-1.5 5-2 8.5-2v-13C17 4.5 14.2 5 12 6.5z"/><path d="M12 6.5v13"/></svg>',
+  search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>',
   check: '<svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>'
 };
 
@@ -553,6 +565,7 @@ function fromHash() {
   if (v === "read" && CH[+a]) route = { v, g: +a };
   else if (v === "book" && B[+a]) route = { v, b: +a };
   else if (v === "progress") route = { v };
+  else if (v === "search") route = { v };
   else route = { v: "day", date: !first && /^\d{4}-\d\d-\d\d$/.test(a || "") ? a : iso(today()) };
   closeSheet(); render();
 }
@@ -682,7 +695,7 @@ const installHelpHTML = () => `<button class="x" data-close aria-label="סגור
 <ol class="help-steps"><li>בהודעה לחצו על <b>״פרטים נוספים״</b> ואז על <b>״התקן בכל זאת״</b>.</li>
 <li>אם אין כפתור כזה: ב-Chrome פתחו את התפריט ⋮ ובחרו <b>״הוסף למסך הבית״</b>, ואז <b>״צור קיצור דרך״</b> (לא ״התקן״). האייקון יופיע במסך הבית ויעבוד כרגיל.</li>
 <li>או פשוט המשיכו להשתמש באתר דרך הדפדפן, בלי להתקין.</li></ol>`;
-const APP_VERSION = "2026.11.25 (v21)";
+const APP_VERSION = "2026.11.25 (v22)";
 const OFF_KEY = "tanachYomi.offline";
 const offStatus = () => { try { const d = localStorage.getItem(OFF_KEY); return d ? "✓ הורד בתאריך " + d + ". אפשר לקרוא בלי אינטרנט." : "מוריד את כל הספרים והפירושים למכשיר, כדי לקרוא גם בלי קליטה (נסיעה, שבת)."; } catch (e) { return ""; } };
 async function offlineDownload() {
@@ -723,13 +736,94 @@ async function hardRefresh() {                                      // מוחק 
   } catch (e) {}
   location.replace(location.pathname + "?r=" + Date.now() + location.hash);
 }
+
+/* ---------- חיפוש חופשי ---------- */
+const SQ = { q: "", full: true, bk: "", shown: 100, scroll: 0 };
+const NV = {}, NS = {};                                   // טקסט מנורמל לכל ספר (ובגרסת שלד ללא ו/י), נבנה בפעם הראשונה
+const nw = s => s.replace(NIK, "").replace(/[־\-]/g, " ").replace(/[^א-ת\s]/g, "").replace(/\s+/g, " ").trim();
+const sk = s => s.replace(/[וי]/g, "");
+const escH = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const TAAM = /[֑-֯]/g;
+async function loadAllText(onProg) {
+  const q = B.map((_, i) => i).filter(i => !TX[i]), total = q.length; let n = 0, fail = 0;
+  const w = async () => { while (q.length) { const b = q.shift(); try { const r = await fetch("text/" + b + ".json"); if (!r.ok) throw 0; TX[b] = await r.json(); } catch (e) { fail++; } n++; if (onProg) onProg(n, total); } };
+  await Promise.all([w(), w(), w(), w()]);
+  return fail === 0;
+}
+const normBook = b => { if (!NV[b]) { NV[b] = TX[b].map(ch => ch.map(nw)); NS[b] = NV[b].map(ch => ch.map(sk)); } };
+function searchView() {
+  const opts = '<option value="">כל התנ״ך</option>' + B.map((x, i) => `<option value="${i}" ${String(SQ.bk) === String(i) ? "selected" : ""}>${x.n}</option>`).join("");
+  return `<header class="rh" style="margin-bottom:12px"><button class="home" data-go="day">${I.home}<span>חזרה לדף הבית</span></button><div class="rt">חיפוש</div></header>
+  <input id="sq" class="sq" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="חפשו מילה או ביטוי (בלי ניקוד)" aria-label="חיפוש בתנ״ך" value="${escH(SQ.q)}">
+  <div class="sopts"><select id="sbk" aria-label="היקף החיפוש">${opts}</select><label><input type="checkbox" id="sfull" ${SQ.full ? "checked" : ""}> התעלמות מכתיב מלא/חסר</label></div>
+  <div id="sres" aria-live="polite"></div>${footer(true)}${tabs()}`;
+}
+function searchInit() {
+  window.scrollTo(0, 0);
+  if (SQ.q) { runSearch(); if (SQ.scroll) { const y = SQ.scroll; SQ.scroll = 0; setTimeout(() => window.scrollTo(0, y), 30); } }
+  else { const i = $("#sq"); if (i && !/iphone|ipad|ipod/i.test(navigator.userAgent)) i.focus(); $("#sres").innerHTML = `<div class="ssum" style="font-weight:600">מחפשים בכל ספרי הנביאים והכתובים שבאפליקציה. אפשר לחפש מילה או כמה מילים, בלי ניקוד וטעמים.</div>`; }
+}
+let sTimer = 0;
+function runSearch() {
+  const box = $("#sres"); if (!box) return;
+  const qn = nw(SQ.q), words = qn.split(" ").filter(Boolean);
+  if (qn.replace(/ /g, "").length < 2) { box.innerHTML = `<div class="ssum" style="font-weight:600">${SQ.q ? "כתבו לפחות שתי אותיות." : ""}</div>`; return; }
+  const missing = B.some((_, i) => !TX[i]);
+  if (missing) {
+    box.innerHTML = `<div class="ssum" id="sload">טוען את הספרים לחיפוש…</div>`;
+    const my = SQ.q;
+    loadAllText((n, t) => { const e = $("#sload"); if (e) e.textContent = `טוען את הספרים לחיפוש… ${n} מתוך ${t}`; }).then(ok => {
+      if (route.v !== "search" || SQ.q !== my) return;
+      if (!ok) { const e = $("#sres"); if (e) e.innerHTML = `<div class="ssum">לא כל הספרים נטענו. בדקו חיבור (או הורידו לקריאה אופליין מתחתית הדף) ונסו שוב.</div>`; return; }
+      runSearch();
+    });
+    return;
+  }
+  const hits = [], bks = SQ.bk === "" ? B.map((_, i) => i) : [+SQ.bk], full = SQ.full;
+  const qk = words.map(w => (full && sk(w).length >= 2) ? sk(w) : w);
+  for (const b of bks) {
+    normBook(b);
+    for (let c = 0; c < NV[b].length; c++) for (let v = 0; v < NV[b][c].length; v++) {
+      const hay = full ? NS[b][c][v] : NV[b][c][v], hayEx = NV[b][c][v];
+      let ok = true;
+      for (let k = 0; k < words.length; k++) { const wk = qk[k]; if (!((wk === words[k] ? hayEx : hay).includes(wk))) { ok = false; break; } }
+      if (ok) hits.push([firstG[b] + c, v]);
+    }
+  }
+  SQ.hits = hits; SQ.words = words; SQ.qk = qk;
+  drawResults();
+}
+function hiVerse(b, c, v) {
+  const raw = TX[b][c][v].replace(TAAM, ""), full = SQ.full, words = SQ.words, qk = SQ.qk;
+  return raw.split(/(\s+)/).map(tok => {
+    if (!tok.trim()) return tok;
+    const wn = nw(tok), ws = full ? sk(wn) : wn; let hit = false;
+    for (let k = 0; k < words.length; k++) { const wk = qk[k]; if ((wk === words[k] ? wn : ws).includes(wk)) { hit = true; break; } }
+    return hit ? `<mark class="hit">${escH(tok)}</mark>` : escH(tok);
+  }).join("");
+}
+function drawResults() {
+  const box = $("#sres"); if (!box) return; const hits = SQ.hits || [];
+  if (!hits.length) { box.innerHTML = `<div class="ssum">לא נמצאו תוצאות ל״${escH(SQ.q.trim())}״. אפשר לנסות פחות מילים, או לסמן התעלמות מכתיב מלא/חסר.</div>`; return; }
+  const show = hits.slice(0, SQ.shown);
+  box.innerHTML = `<div class="ssum">${hits.length} תוצאות${SQ.bk === "" ? "" : " ב" + B[+SQ.bk].n}${hits.length > show.length ? " (מוצגות " + show.length + ")" : ""}</div>` +
+    show.map(([g, v]) => `<button class="sres" data-read="${g}" data-v="${v}" data-fromsearch><div class="sref">${chName(g)} · פסוק ${gem(v + 1)}</div><div class="stx">${hiVerse(CH[g].b, CH[g].c, v)}</div></button>`).join("") +
+    (hits.length > show.length ? `<button class="smore" data-smore>הצג עוד</button>` : "");
+}
+document.addEventListener("input", e => {
+  if (e.target.id === "sq") { SQ.q = e.target.value; SQ.shown = 100; clearTimeout(sTimer); sTimer = setTimeout(runSearch, 250); }
+});
+document.addEventListener("change", e => {
+  if (e.target.id === "sbk") { SQ.bk = e.target.value; SQ.shown = 100; runSearch(); }
+  else if (e.target.id === "sfull") { SQ.full = e.target.checked; SQ.shown = 100; runSearch(); }
+});
 const MAM_SRC = "https://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%AA%D7%9E%D7%A9:Dovi/%D7%9E%D7%A7%D7%A8%D7%90_%D7%A2%D7%9C_%D7%A4%D7%99_%D7%94%D7%9E%D7%A1%D7%95%D7%A8%D7%94";
 function footer(src) {
   return `<footer class="ft"><div class="cp">© רפאל בטיט · כל הזכויות שמורות על עיצוב ופיתוח האפליקציה</div><div class="ver">גרסה ${APP_VERSION}</div><button class="refbtn" data-refresh>🔄 ריענון לגירסה חדשה</button><div class="vernote">הריענון מוריד את הגרסה העדכנית. ההתקדמות והסימניות שלך נשמרות.</div><button class="offbtn" data-offline>📥 הורדה לקריאה אופליין</button><div class="vernote" id="offst">${offStatus()}</div>${src ? `<div class="src">נוסח המקרא: <a href="${MAM_SRC}" target="_blank" rel="noopener">מקרא על פי המסורה (MAM)</a>, ברישיון CC-BY-SA, באמצעות ספריא. בתצוגה זו הוצג הקרי בלבד במקום כתיב וקרי, הוסרו סימוני פתוחות וסתומות, וטעמי המקרא ניתנים להסתרה. פירושי מצודת דוד ומצודת ציון: נחלת הכלל. קישורי שמע ולימוד: הרב מוטי פרנקו (Spotify) וישיבת הר עציון.</div>` : ""}</footer>`;
 }
 function tabs() {
-  const on = route.v === "progress" || route.v === "book" ? "p" : "d", pct = Math.round(doneCount() / TOTAL * 100);
-  return `<nav class="tabs">${navBack()}<button class="hl" data-go="progress" ${on === "p" ? 'aria-current="page"' : ""}><i>${pct}%</i>${I.chart}<span>התקדמות שלי</span></button><button class="${on === "d" ? "on" : ""}" data-go="day">${I.home}<span>דף הבית</span></button>${navFwd()}</nav>`;
+  const on = route.v === "progress" || route.v === "book" ? "p" : route.v === "search" ? "s" : "d", pct = Math.round(doneCount() / TOTAL * 100);
+  return `<nav class="tabs">${navBack()}<button class="hl" data-go="progress" ${on === "p" ? 'aria-current="page"' : ""}><i>${pct}%</i>${I.chart}<span>התקדמות שלי</span></button><button class="${on === "d" ? "on" : ""}" data-go="day">${I.home}<span>דף הבית</span></button><button class="${on === "s" ? "on" : ""}" data-go="search" ${on === "s" ? 'aria-current="page"' : ""}>${I.search}<span>חיפוש</span></button>${navFwd()}</nav>`;
 }
 const DOW = ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳"];
 function weekStrip(d, isToday) {
@@ -869,13 +963,14 @@ function pulseVerse(v, el) { route.pulseV = v; route.pulseUntil = Date.now() + 2
 function render() {
   if (route.v !== "book") { selMode = false; SEL.clear(); }
   const sy = window.scrollY, app = $("#app");
-  app.innerHTML = route.v === "read" ? readView() : route.v === "book" ? bookView() : route.v === "progress" ? progressView() : dayView();
+  app.innerHTML = route.v === "read" ? readView() : route.v === "book" ? bookView() : route.v === "progress" ? progressView() : route.v === "search" ? searchView() : dayView();
   if (route.v === "read") {
     const t = route.scrollV != null ? route.scrollV : markV(route.g);
     const el = t != null ? $("#v" + t) : null;
     if (route.keep) window.scrollTo(0, sy); else if (el) { el.scrollIntoView({ block: "center" }); pulseVerse(t, el); } else window.scrollTo(0, 0);
     route.keep = false; route.scrollV = null;
-  } else if (route.keep) { window.scrollTo(0, sy); route.keep = false; } else window.scrollTo(0, 0);
+  } else if (route.v === "search") { searchInit(); route.keep = false; }
+  else if (route.keep) { window.scrollTo(0, sy); route.keep = false; } else window.scrollTo(0, 0);
 }
 
 /* ---------- חלונות קופצים ---------- */
@@ -915,7 +1010,7 @@ function settingsHTML() {
 /* ---------- אירועים ---------- */
 document.addEventListener("click", e => {
   if (e.target.id === "ov") return closeSheet();
-  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-sunset],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk],[data-navback],[data-navfwd],[data-refresh],[data-offline],[data-bkdo],[data-bookall],[data-selmode],[data-pick],[data-selact]");
+  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-sunset],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk],[data-navback],[data-navfwd],[data-refresh],[data-smore],[data-offline],[data-bkdo],[data-bookall],[data-selmode],[data-pick],[data-selact]");
   if (!t) return;
   const D = t.dataset;
   if (t.hasAttribute("data-close")) closeSheet();
@@ -925,6 +1020,7 @@ document.addEventListener("click", e => {
   else if (D.th) { S.theme = D.th; applyTheme(); save(); document.querySelectorAll("#sheet [data-th]").forEach(b => b.classList.toggle("on", b.dataset.th === S.theme)); }
   else if (D.fs && t.closest("#sheet")) { S.fs = Math.min(48, Math.max(16, S.fs + +D.fs)); save(); const tx = $(".text"); if (tx) tx.style.setProperty("--fs", S.fs + "px"); const lb = t.parentElement.querySelector(".on"); if (lb) lb.textContent = S.fs; }
   else if (t.hasAttribute("data-refresh")) hardRefresh();
+  else if (t.hasAttribute("data-smore")) { SQ.shown += 100; drawResults(); }
   else if (t.hasAttribute("data-offline")) offlineDownload();
   else if (t.hasAttribute("data-bkdo")) { const c = ($("#bkcode").value || "").trim(); if (!c) return; closeSheet(); try { applyBackup(fromCode(c)); } catch (er) { toast("הקוד לא תקין"); } }
   else if (t.hasAttribute("data-navback")) { if (navIdx > 0) history.back(); }
@@ -958,9 +1054,10 @@ document.addEventListener("click", e => {
   else if (t.hasAttribute("data-join")) { S.from = Math.max(0, dayIdx(today())) * PER_DAY; save(); toast("מעכשיו נספרים רק פרקים מהיום והלאה"); route.keep = true; render(); }
   else if (t.hasAttribute("data-markall")) { if (confirm("לסמן את כל הפרקים עד היום כנלמדו?")) { const lim = Math.min(Math.max(0, dayIdx(today())), DAYS) * PER_DAY; for (let g = 0; g < Math.min(lim, TOTAL); g++) S.done[ck(g)] = 1; save(); route.keep = true; render(); } }
   else if (D.bk) backup(D.bk);
-  else if (D.go) go(D.go === "day" ? { v: "day", date: iso(today()) } : { v: "progress" });
+  else if (D.go) go(D.go === "day" ? { v: "day", date: iso(today()) } : D.go === "search" ? { v: "search" } : { v: "progress" });
   else if (t.hasAttribute("data-undo")) { if (lastBm) { S.bm = lastBm; lastBm = null; save(); $("#toast").classList.remove("show"); if (route.v === "read") route.resume = null; route.keep = true; render(); } }
   else if (D.read != null) {
+    if (t.hasAttribute("data-fromsearch")) SQ.scroll = window.scrollY;
     const r = { v: "read", g: +D.read, scrollV: D.v != null ? +D.v : null };
     if (t.hasAttribute("data-resume") && S.bm) {                       // ממשיכים ללמוד - הסימניה הישנה כבר לא נחוצה
       lastBm = S.bm; r.resume = S.bm; S.bm = null; save(); toast("הסימניה הוסרה - מתקדמים הלאה", "ביטול");
