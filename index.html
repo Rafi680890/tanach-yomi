@@ -695,7 +695,7 @@ const installHelpHTML = () => `<button class="x" data-close aria-label="סגור
 <ol class="help-steps"><li>בהודעה לחצו על <b>״פרטים נוספים״</b> ואז על <b>״התקן בכל זאת״</b>.</li>
 <li>אם אין כפתור כזה: ב-Chrome פתחו את התפריט ⋮ ובחרו <b>״הוסף למסך הבית״</b>, ואז <b>״צור קיצור דרך״</b> (לא ״התקן״). האייקון יופיע במסך הבית ויעבוד כרגיל.</li>
 <li>או פשוט המשיכו להשתמש באתר דרך הדפדפן, בלי להתקין.</li></ol>`;
-const APP_VERSION = "2026.11.25 (v22)";
+const APP_VERSION = "2026.11.25 (v24)";
 const OFF_KEY = "tanachYomi.offline";
 const offStatus = () => { try { const d = localStorage.getItem(OFF_KEY); return d ? "✓ הורד בתאריך " + d + ". אפשר לקרוא בלי אינטרנט." : "מוריד את כל הספרים והפירושים למכשיר, כדי לקרוא גם בלי קליטה (נסיעה, שבת)."; } catch (e) { return ""; } };
 async function offlineDownload() {
@@ -738,7 +738,7 @@ async function hardRefresh() {                                      // מוחק 
 }
 
 /* ---------- חיפוש חופשי ---------- */
-const SQ = { q: "", full: true, bk: "", shown: 100, scroll: 0 };
+const SQ = { q: "", full: true, part: false, bk: "", shown: 100, scroll: 0 };
 const NV = {}, NS = {};                                   // טקסט מנורמל לכל ספר (ובגרסת שלד ללא ו/י), נבנה בפעם הראשונה
 const nw = s => s.replace(NIK, "").replace(/[־\-]/g, " ").replace(/[^א-ת\s]/g, "").replace(/\s+/g, " ").trim();
 const sk = s => s.replace(/[וי]/g, "");
@@ -750,12 +750,24 @@ async function loadAllText(onProg) {
   await Promise.all([w(), w(), w(), w()]);
   return fail === 0;
 }
-const normBook = b => { if (!NV[b]) { NV[b] = TX[b].map(ch => ch.map(nw)); NS[b] = NV[b].map(ch => ch.map(sk)); } };
+const PRE = "ובהכלמש", NWD = {};
+const wordsOf = b => NWD[b] || (NWD[b] = TX[b].map(ch => ch.map(v => nw(v).split(" "))));
+function variants(q) {                                    // כתיב מלא/חסר: הוספה או הסרה של ו/י אחת
+  const s = new Set([q]);
+  for (let i = 0; i < q.length; i++) if ("וי".includes(q[i])) { const r = q.slice(0, i) + q.slice(i + 1); if (r.length >= 3) s.add(r); }
+  for (let i = 1; i < q.length; i++) { s.add(q.slice(0, i) + "ו" + q.slice(i)); s.add(q.slice(0, i) + "י" + q.slice(i)); }
+  return s;
+}
+function mkMatch(q) {
+  const set = SQ.full ? variants(q) : new Set([q]), nd = [...set];
+  if (SQ.part) return w => nd.some(n => w.includes(n));
+  return w => { for (let i = 0; i <= 2; i++) { if (i > 0 && !PRE.includes(w[i - 1])) break; const x = w.slice(i); if (x.length < 2) break; if (set.has(x)) return true; } return false; };
+};
 function searchView() {
   const opts = '<option value="">כל התנ״ך</option>' + B.map((x, i) => `<option value="${i}" ${String(SQ.bk) === String(i) ? "selected" : ""}>${x.n}</option>`).join("");
   return `<header class="rh" style="margin-bottom:12px"><button class="home" data-go="day">${I.home}<span>חזרה לדף הבית</span></button><div class="rt">חיפוש</div></header>
   <input id="sq" class="sq" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="חפשו מילה או ביטוי (בלי ניקוד)" aria-label="חיפוש בתנ״ך" value="${escH(SQ.q)}">
-  <div class="sopts"><select id="sbk" aria-label="היקף החיפוש">${opts}</select><label><input type="checkbox" id="sfull" ${SQ.full ? "checked" : ""}> התעלמות מכתיב מלא/חסר</label></div>
+  <div class="sopts"><select id="sbk" aria-label="היקף החיפוש">${opts}</select><label><input type="checkbox" id="sfull" ${SQ.full ? "checked" : ""}> כולל כתיב מלא/חסר (דוד ↔ דויד)</label><label><input type="checkbox" id="spart" ${SQ.part ? "checked" : ""}> גם חלק ממילה</label></div>
   <div id="sres" aria-live="polite"></div>${footer(true)}${tabs()}`;
 }
 function searchInit() {
@@ -779,32 +791,30 @@ function runSearch() {
     });
     return;
   }
-  const hits = [], bks = SQ.bk === "" ? B.map((_, i) => i) : [+SQ.bk], full = SQ.full;
-  const qk = words.map(w => (full && sk(w).length >= 2) ? sk(w) : w);
+  const hits = [], bks = SQ.bk === "" ? B.map((_, i) => i) : [+SQ.bk], ms = words.map(mkMatch);
   for (const b of bks) {
-    normBook(b);
-    for (let c = 0; c < NV[b].length; c++) for (let v = 0; v < NV[b][c].length; v++) {
-      const hay = full ? NS[b][c][v] : NV[b][c][v], hayEx = NV[b][c][v];
-      let ok = true;
-      for (let k = 0; k < words.length; k++) { const wk = qk[k]; if (!((wk === words[k] ? hayEx : hay).includes(wk))) { ok = false; break; } }
+    const W = wordsOf(b);
+    for (let c = 0; c < W.length; c++) for (let v = 0; v < W[c].length; v++) {
+      const ws = W[c][v]; let ok = true;
+      for (let k = 0; k < ms.length; k++) { if (!ws.some(ms[k])) { ok = false; break; } }
       if (ok) hits.push([firstG[b] + c, v]);
     }
   }
-  SQ.hits = hits; SQ.words = words; SQ.qk = qk;
+  SQ.hits = hits; SQ.words = words; SQ.ms = ms;
   drawResults();
 }
 function hiVerse(b, c, v) {
-  const raw = TX[b][c][v].replace(TAAM, ""), full = SQ.full, words = SQ.words, qk = SQ.qk;
+  const raw = TX[b][c][v].replace(TAAM, ""), ms = SQ.ms;
   return raw.split(/(\s+)/).map(tok => {
     if (!tok.trim()) return tok;
-    const wn = nw(tok), ws = full ? sk(wn) : wn; let hit = false;
-    for (let k = 0; k < words.length; k++) { const wk = qk[k]; if ((wk === words[k] ? wn : ws).includes(wk)) { hit = true; break; } }
+    const ws = nw(tok).split(" ").filter(Boolean); let hit = false;
+    for (const m of ms) if (ws.some(m)) { hit = true; break; }
     return hit ? `<mark class="hit">${escH(tok)}</mark>` : escH(tok);
   }).join("");
 }
 function drawResults() {
   const box = $("#sres"); if (!box) return; const hits = SQ.hits || [];
-  if (!hits.length) { box.innerHTML = `<div class="ssum">לא נמצאו תוצאות ל״${escH(SQ.q.trim())}״. אפשר לנסות פחות מילים, או לסמן התעלמות מכתיב מלא/חסר.</div>`; return; }
+  if (!hits.length) { box.innerHTML = `<div class="ssum">לא נמצאו תוצאות ל״${escH(SQ.q.trim())}״. אפשר לנסות פחות מילים, לסמן ״כולל כתיב מלא/חסר״ או ״גם חלק ממילה״.</div>`; return; }
   const show = hits.slice(0, SQ.shown);
   box.innerHTML = `<div class="ssum">${hits.length} תוצאות${SQ.bk === "" ? "" : " ב" + B[+SQ.bk].n}${hits.length > show.length ? " (מוצגות " + show.length + ")" : ""}</div>` +
     show.map(([g, v]) => `<button class="sres" data-read="${g}" data-v="${v}" data-fromsearch><div class="sref">${chName(g)} · פסוק ${gem(v + 1)}</div><div class="stx">${hiVerse(CH[g].b, CH[g].c, v)}</div></button>`).join("") +
@@ -816,6 +826,7 @@ document.addEventListener("input", e => {
 document.addEventListener("change", e => {
   if (e.target.id === "sbk") { SQ.bk = e.target.value; SQ.shown = 100; runSearch(); }
   else if (e.target.id === "sfull") { SQ.full = e.target.checked; SQ.shown = 100; runSearch(); }
+  else if (e.target.id === "spart") { SQ.part = e.target.checked; SQ.shown = 100; runSearch(); }
 });
 const MAM_SRC = "https://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%AA%D7%9E%D7%A9:Dovi/%D7%9E%D7%A7%D7%A8%D7%90_%D7%A2%D7%9C_%D7%A4%D7%99_%D7%94%D7%9E%D7%A1%D7%95%D7%A8%D7%94";
 function footer(src) {
@@ -910,12 +921,15 @@ function bookView() {
   return h + footer(false) + tabs();
 }
 const stripT = s => s.replace(/[\u0591-\u05AF\u05C0]/g, "");
+const NKM = new Map(), PCM = new Map();                       // זיכרון ביניים: עיבוד מילה/פירוש הוא פונקציה טהורה, ולכן לא מחשבים אותו מחדש בכל רינדור
+const nkh = t => { const k = (S.taamim ? "1" : "0") + t; let r = NKM.get(k); if (r === undefined) { r = NK.html(t, S.taamim); NKM.set(k, r); } return r; };
+const parseCm = (s, src) => { const k = src + s; let r = PCM.get(k); if (r === undefined) { r = parseC(s, src); PCM.set(k, r); } return r; };
 function verseHTML(v, i, g, j) {
   const text = v.trim();                                       // הטקסט המלא: הזיהוי הדקדוקי זקוק לטעמים; הסרתם נעשית ב-NK
   const toks = (text.match(/[^־\s]+־?/g) || []).filter(t => S.taamim || !/^׀$/.test(t));
-  const words = toks.map((t, k) => ({ t, n: norm(t), h: NK.html(t, S.taamim) }));
+  const words = toks.map((t, k) => ({ t, n: norm(t), h: nkh(t) }));
   let cs = [];
-  if (j) { const c = CH[g].c; ["d", "z"].forEach(k => { if (S[k === "d" ? "cd" : "cz"] && j[k] && j[k][c] && j[k][c][i]) j[k][c][i].forEach(s => cs.push(parseC(s, k))); }); }
+  if (j) { const c = CH[g].c; ["d", "z"].forEach(k => { if (S[k === "d" ? "cd" : "cz"] && j[k] && j[k][c] && j[k][c][i]) j[k][c][i].forEach(s => cs.push(parseCm(s, k))); }); }
   const { map, loose } = annotate(words, cs);
   const ids = new Map(), idOf = c => { if (!ids.has(c)) { ids.set(c, POP.length); POP.push(c); } return ids.get(c); };
   const key = k => map[k] ? map[k].map(idOf).join(",") : "";
