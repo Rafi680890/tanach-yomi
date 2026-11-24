@@ -680,9 +680,11 @@ const installHelpHTML = () => `<button class="x" data-close aria-label="סגור
 <ol class="help-steps"><li>בהודעה לחצו על <b>״פרטים נוספים״</b> ואז על <b>״התקן בכל זאת״</b>.</li>
 <li>אם אין כפתור כזה: ב-Chrome פתחו את התפריט ⋮ ובחרו <b>״הוסף למסך הבית״</b>, ואז <b>״צור קיצור דרך״</b> (לא ״התקן״). האייקון יופיע במסך הבית ויעבוד כרגיל.</li>
 <li>או פשוט המשיכו להשתמש באתר דרך הדפדפן, בלי להתקין.</li></ol>`;
-const APP_VERSION = "2026.11.24 (v19)";
+const APP_VERSION = "2026.11.25 (v20)";
 async function hardRefresh() {                                      // מוחק רק את קבצי האפליקציה השמורים (מטמון), לא את ההתקדמות
-  if (!navigator.onLine) { toast("צריך חיבור לאינטרנט כדי לרענן"); return; }
+  toast("בודק חיבור…");
+  try { const r = await fetch(location.pathname + "?r=" + Date.now(), { cache: "no-store" }); if (!r.ok) throw 0; }   // בדיקה אמיתית: onLine מחזיר true גם ב-Wi-Fi בלי אינטרנט
+  catch (e) { toast("אין חיבור לאינטרנט - הריענון בוטל, האפליקציה נשארת כמו שהיא"); return; }
   toast("מרענן לגרסה החדשה…");
   try {
     if (navigator.serviceWorker) { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r => r.unregister())); }
@@ -882,7 +884,7 @@ function settingsHTML() {
 /* ---------- אירועים ---------- */
 document.addEventListener("click", e => {
   if (e.target.id === "ov") return closeSheet();
-  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-sunset],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk],[data-navback],[data-navfwd],[data-refresh],[data-bookall],[data-selmode],[data-pick],[data-selact]");
+  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-sunset],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk],[data-navback],[data-navfwd],[data-refresh],[data-bkdo],[data-bookall],[data-selmode],[data-pick],[data-selact]");
   if (!t) return;
   const D = t.dataset;
   if (t.hasAttribute("data-close")) closeSheet();
@@ -892,6 +894,7 @@ document.addEventListener("click", e => {
   else if (D.th) { S.theme = D.th; applyTheme(); save(); document.querySelectorAll("#sheet [data-th]").forEach(b => b.classList.toggle("on", b.dataset.th === S.theme)); }
   else if (D.fs && t.closest("#sheet")) { S.fs = Math.min(48, Math.max(16, S.fs + +D.fs)); save(); const tx = $(".text"); if (tx) tx.style.setProperty("--fs", S.fs + "px"); const lb = t.parentElement.querySelector(".on"); if (lb) lb.textContent = S.fs; }
   else if (t.hasAttribute("data-refresh")) hardRefresh();
+  else if (t.hasAttribute("data-bkdo")) { const c = ($("#bkcode").value || "").trim(); if (!c) return; closeSheet(); try { applyBackup(fromCode(c)); } catch (er) { toast("הקוד לא תקין"); } }
   else if (t.hasAttribute("data-navback")) { if (navIdx > 0) history.back(); }
   else if (t.hasAttribute("data-navfwd")) { if (navIdx < navMax) history.forward(); }
   else if (D.bookall != null) {
@@ -955,7 +958,7 @@ document.addEventListener("keydown", e => {
 /* ---------- גיבוי ושחזור ---------- */
 const bkData = () => ({ app: "tanach-yomi", v: 2, done: S.done, bm: S.bm, from: S.from });
 const toCode = o => { const b = new TextEncoder().encode(JSON.stringify(o)); let s = ""; for (let i = 0; i < b.length; i += 8192) s += String.fromCharCode.apply(null, b.subarray(i, i + 8192)); return btoa(s); };
-const fromCode = c => JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(c), ch => ch.charCodeAt(0))));
+const fromCode = c => { if (c.length > 50000) throw 0; return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(c), ch => ch.charCodeAt(0)))); };
 function applyBackup(o) {
   if (!o || o.app !== "tanach-yomi" || !o.done) throw 0;
   if (typeof o.done !== "object") throw 0;
@@ -976,12 +979,12 @@ function backup(kind) {
     const a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   } else if (kind === "restore") {
-    const c = prompt("הדבק כאן את קוד הגיבוי:"); if (!c) return;
-    try { applyBackup(fromCode(c.trim())); } catch (e) { toast("הקוד לא תקין"); }
+    openSheet(`<button class="x" data-close aria-label="סגור">✕</button><h3 class="sh" style="margin-top:4px">שחזור מקוד</h3><p style="margin:0 0 8px;color:var(--mute);font-size:14px">הדביקו כאן את קוד הגיבוי ולחצו ״שחזר״.</p><textarea id="bkcode" dir="ltr" rows="5" style="width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:14px;background:var(--bg);color:var(--ink)"></textarea><div class="nav"><button class="p" data-bkdo>שחזר</button></div>`);
+    setTimeout(() => { const t = $("#bkcode"); if (t) t.focus(); }, 50);
   } else if (kind === "load") $("#bkf").click();
 }
 document.addEventListener("change", e => {
-  if (e.target.id === "bkf" && e.target.files[0]) { const r = new FileReader(); r.onload = () => { try { applyBackup(JSON.parse(r.result)); } catch (x) { toast("הקובץ לא תקין"); } }; r.readAsText(e.target.files[0]); e.target.value = ""; return; }
+  if (e.target.id === "bkf" && e.target.files[0]) { const r = new FileReader(); r.onload = () => { try { if (r.result.length > 200000) throw 0; applyBackup(JSON.parse(r.result)); } catch (x) { toast("הקובץ לא תקין"); } }; r.readAsText(e.target.files[0]); e.target.value = ""; return; }
   const k = e.target.dataset.nav; if (!k) return; const v = e.target.value;
   if (k === "book") { navBook = v; route.keep = true; render(); return; }
   if (k === "chap") { if (v !== "") go({ v: "read", g: firstG[+navBook] + +v }); return; }
