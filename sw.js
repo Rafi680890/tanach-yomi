@@ -1,4 +1,4 @@
-const CACHE = "tanach-yomi-v14";
+const CACHE = "tanach-yomi-v15";
 const CORE = ["./", "index.html", "meta.js", "font-tx4.woff2", "font-ui.woff2", "font-nk4-s.woff2", "font-nk4-d.woff2", "font-nk4-sd.woff2", "font-nk4-q.woff2", "font-nk4-dq.woff2", "logo.png", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 const COMM = Array.from({ length: 34 }, (_, i) => ["text/" + i + ".json", "comm/" + i + ".json"]).flat();
 self.addEventListener("install", e => {
