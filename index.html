@@ -695,7 +695,7 @@ const installHelpHTML = () => `<button class="x" data-close aria-label="סגור
 <ol class="help-steps"><li>בהודעה לחצו על <b>״פרטים נוספים״</b> ואז על <b>״התקן בכל זאת״</b>.</li>
 <li>אם אין כפתור כזה: ב-Chrome פתחו את התפריט ⋮ ובחרו <b>״הוסף למסך הבית״</b>, ואז <b>״צור קיצור דרך״</b> (לא ״התקן״). האייקון יופיע במסך הבית ויעבוד כרגיל.</li>
 <li>או פשוט המשיכו להשתמש באתר דרך הדפדפן, בלי להתקין.</li></ol>`;
-const APP_VERSION = "2026.11.25 (v24)";
+const APP_VERSION = "2026.11.25 (v25)";
 const OFF_KEY = "tanachYomi.offline";
 const offStatus = () => { try { const d = localStorage.getItem(OFF_KEY); return d ? "✓ הורד בתאריך " + d + ". אפשר לקרוא בלי אינטרנט." : "מוריד את כל הספרים והפירושים למכשיר, כדי לקרוא גם בלי קליטה (נסיעה, שבת)."; } catch (e) { return ""; } };
 async function offlineDownload() {
@@ -738,7 +738,7 @@ async function hardRefresh() {                                      // מוחק 
 }
 
 /* ---------- חיפוש חופשי ---------- */
-const SQ = { q: "", full: true, part: false, bk: "", shown: 100, scroll: 0 };
+const SQ = { q: "", full: false, part: false, bk: "", shown: 100, scroll: 0 };
 const NV = {}, NS = {};                                   // טקסט מנורמל לכל ספר (ובגרסת שלד ללא ו/י), נבנה בפעם הראשונה
 const nw = s => s.replace(NIK, "").replace(/[־\-]/g, " ").replace(/[^א-ת\s]/g, "").replace(/\s+/g, " ").trim();
 const sk = s => s.replace(/[וי]/g, "");
@@ -758,11 +758,12 @@ function variants(q) {                                    // כתיב מלא/ח�
   for (let i = 1; i < q.length; i++) { s.add(q.slice(0, i) + "ו" + q.slice(i)); s.add(q.slice(0, i) + "י" + q.slice(i)); }
   return s;
 }
-function mkMatch(q) {
-  const set = SQ.full ? variants(q) : new Set([q]), nd = [...set];
+function mkMatch(q, full) {
+  const bases = [q]; if ("ובהכלמ".includes(q[0]) && q.length >= 5 || ("וה".includes(q[0]) && q.length >= 4)) bases.push(q.slice(1));   // בהיותם -> גם היותם
+  const set = new Set(); for (const x of bases) (full ? variants(x) : [x]).forEach(y => set.add(y)); const nd = [...set];
   if (SQ.part) return w => nd.some(n => w.includes(n));
   return w => { for (let i = 0; i <= 2; i++) { if (i > 0 && !PRE.includes(w[i - 1])) break; const x = w.slice(i); if (x.length < 2) break; if (set.has(x)) return true; } return false; };
-};
+}
 function searchView() {
   const opts = '<option value="">כל התנ״ך</option>' + B.map((x, i) => `<option value="${i}" ${String(SQ.bk) === String(i) ? "selected" : ""}>${x.n}</option>`).join("");
   return `<header class="rh" style="margin-bottom:12px"><button class="home" data-go="day">${I.home}<span>חזרה לדף הבית</span></button><div class="rt">חיפוש</div></header>
@@ -791,16 +792,21 @@ function runSearch() {
     });
     return;
   }
-  const hits = [], bks = SQ.bk === "" ? B.map((_, i) => i) : [+SQ.bk], ms = words.map(mkMatch);
-  for (const b of bks) {
-    const W = wordsOf(b);
-    for (let c = 0; c < W.length; c++) for (let v = 0; v < W[c].length; v++) {
-      const ws = W[c][v]; let ok = true;
-      for (let k = 0; k < ms.length; k++) { if (!ws.some(ms[k])) { ok = false; break; } }
-      if (ok) hits.push([firstG[b] + c, v]);
+  const bks = SQ.bk === "" ? B.map((_, i) => i) : [+SQ.bk];
+  const find = full => {
+    const ms = words.map(w => mkMatch(w, full)), out = [];
+    for (const b of bks) {
+      const W = wordsOf(b);
+      for (let c = 0; c < W.length; c++) for (let v = 0; v < W[c].length; v++) {
+        const ws = W[c][v]; let ok = true;
+        for (let k = 0; k < ms.length; k++) { if (!ws.some(ms[k])) { ok = false; break; } }
+        if (ok) out.push([firstG[b] + c, v]);
+      }
     }
-  }
-  SQ.hits = hits; SQ.words = words; SQ.ms = ms;
+    return { out, ms };
+  };
+  const r = find(SQ.full); SQ.hits = r.out; SQ.words = words; SQ.ms = r.ms;
+  SQ.extra = SQ.full ? 0 : Math.max(0, find(true).out.length - r.out.length);   // כמה תוצאות נוספות יש בכתיב מלא/חסר
   drawResults();
 }
 function hiVerse(b, c, v) {
@@ -814,9 +820,10 @@ function hiVerse(b, c, v) {
 }
 function drawResults() {
   const box = $("#sres"); if (!box) return; const hits = SQ.hits || [];
-  if (!hits.length) { box.innerHTML = `<div class="ssum">לא נמצאו תוצאות ל״${escH(SQ.q.trim())}״. אפשר לנסות פחות מילים, לסמן ״כולל כתיב מלא/חסר״ או ״גם חלק ממילה״.</div>`; return; }
+  const more = SQ.extra ? `<button class="smore" data-sfull style="margin:6px 0 10px">הצג גם ${SQ.extra} תוצאות בכתיב מלא/חסר</button>` : "";
+  if (!hits.length) { box.innerHTML = `<div class="ssum">לא נמצאו תוצאות ל״${escH(SQ.q.trim())}״ בכתיב הזה.</div>${more}<div class="ssum" style="font-weight:600">אפשר לנסות פחות מילים או לסמן ״גם חלק ממילה״.</div>`; return; }
   const show = hits.slice(0, SQ.shown);
-  box.innerHTML = `<div class="ssum">${hits.length} תוצאות${SQ.bk === "" ? "" : " ב" + B[+SQ.bk].n}${hits.length > show.length ? " (מוצגות " + show.length + ")" : ""}</div>` +
+  box.innerHTML = `<div class="ssum">${hits.length} תוצאות${SQ.bk === "" ? "" : " ב" + B[+SQ.bk].n}${hits.length > show.length ? " (מוצגות " + show.length + ")" : ""}</div>` + more +
     show.map(([g, v]) => `<button class="sres" data-read="${g}" data-v="${v}" data-fromsearch><div class="sref">${chName(g)} · פסוק ${gem(v + 1)}</div><div class="stx">${hiVerse(CH[g].b, CH[g].c, v)}</div></button>`).join("") +
     (hits.length > show.length ? `<button class="smore" data-smore>הצג עוד</button>` : "");
 }
@@ -1024,7 +1031,7 @@ function settingsHTML() {
 /* ---------- אירועים ---------- */
 document.addEventListener("click", e => {
   if (e.target.id === "ov") return closeSheet();
-  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-sunset],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk],[data-navback],[data-navfwd],[data-refresh],[data-smore],[data-offline],[data-bkdo],[data-bookall],[data-selmode],[data-pick],[data-selact]");
+  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-sunset],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk],[data-navback],[data-navfwd],[data-refresh],[data-smore],[data-sfull],[data-offline],[data-bkdo],[data-bookall],[data-selmode],[data-pick],[data-selact]");
   if (!t) return;
   const D = t.dataset;
   if (t.hasAttribute("data-close")) closeSheet();
@@ -1035,6 +1042,7 @@ document.addEventListener("click", e => {
   else if (D.fs && t.closest("#sheet")) { S.fs = Math.min(48, Math.max(16, S.fs + +D.fs)); save(); const tx = $(".text"); if (tx) tx.style.setProperty("--fs", S.fs + "px"); const lb = t.parentElement.querySelector(".on"); if (lb) lb.textContent = S.fs; }
   else if (t.hasAttribute("data-refresh")) hardRefresh();
   else if (t.hasAttribute("data-smore")) { SQ.shown += 100; drawResults(); }
+  else if (t.hasAttribute("data-sfull")) { SQ.full = true; SQ.shown = 100; const cb = $("#sfull"); if (cb) cb.checked = true; runSearch(); }
   else if (t.hasAttribute("data-offline")) offlineDownload();
   else if (t.hasAttribute("data-bkdo")) { const c = ($("#bkcode").value || "").trim(); if (!c) return; closeSheet(); try { applyBackup(fromCode(c)); } catch (er) { toast("הקוד לא תקין"); } }
   else if (t.hasAttribute("data-navback")) { if (navIdx > 0) history.back(); }
