@@ -591,7 +591,7 @@ function loadComm(b) {
 const TX = {}, txLoading = {}, txFail = {};
 window.addEventListener("online", () => { for (const k in commFail) delete commFail[k]; commToasted = false; for (const k in txFail) delete txFail[k]; if (route.v === "read") { route.keep = true; render(); } });
 function loadText(b) {
-  if (TX[b] || txLoading[b]) return; txLoading[b] = 1; delete txFail[b];
+  if (TX[b] || txLoading[b] || txFail[b]) return; txLoading[b] = 1;   // אחרי כשל לא מנסים שוב אוטומטית (אחרת לולאת טעינה בלי הפסקה); ניסיון חוזר: כפתור או חזרת חיבור
   fetch("text/" + b + ".json").then(r => { if (!r.ok) throw 0; return r.json(); }).then(j => { TX[b] = j; })
     .catch(() => { txFail[b] = 1; })
     .finally(() => { delete txLoading[b]; if (route.v === "read" && CH[route.g].b === b) render(); else if (route.v === "day" && bmG() != null && CH[bmG()].b === b) { route.keep = true; render(); } });
@@ -698,7 +698,7 @@ const installHelpHTML = () => `<button class="x" data-close aria-label="סגור
 <ol class="help-steps"><li>בהודעה לחצו על <b>״פרטים נוספים״</b> ואז על <b>״התקן בכל זאת״</b>.</li>
 <li>אם אין כפתור כזה: ב-Chrome פתחו את התפריט ⋮ ובחרו <b>״הוסף למסך הבית״</b>, ואז <b>״צור קיצור דרך״</b> (לא ״התקן״). האייקון יופיע במסך הבית ויעבוד כרגיל.</li>
 <li>או פשוט המשיכו להשתמש באתר דרך הדפדפן, בלי להתקין.</li></ol>`;
-const APP_VERSION = "2026.11.25 (v27)";
+const APP_VERSION = "2026.11.25 (v28)";
 const OFF_KEY = "tanachYomi.offline";
 const offStatus = () => { try { const d = localStorage.getItem(OFF_KEY); return d ? "✓ הורד בתאריך " + d + ". אפשר לקרוא בלי אינטרנט." : "מוריד את כל הספרים והפירושים למכשיר, כדי לקרוא גם בלי קליטה (נסיעה, שבת)."; } catch (e) { return ""; } };
 async function offlineDownload() {
@@ -1107,6 +1107,16 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") closeSheet();
+  if (e.key === "Tab" && $("#ov").classList.contains("show")) {   // מלכודת פוקוס: Tab לא יוצא מהחלונית לשורת הכתובת של הדפדפן
+    const sh = $("#sheet"), fs = [...sh.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(x => x.offsetParent !== null || x === document.activeElement);
+    if (!fs.length) { e.preventDefault(); sh.focus(); }
+    else {
+      const first = fs[0], last = fs[fs.length - 1], ae = document.activeElement;
+      if (!sh.contains(ae) || ae === sh) { e.preventDefault(); (e.shiftKey ? last : first).focus(); }
+      else if (e.shiftKey && ae === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && ae === last) { e.preventDefault(); first.focus(); }
+    }
+  }
   if ((e.key === "Enter" || e.key === " ") && e.target.getAttribute && e.target.getAttribute("role") === "button") { e.preventDefault(); e.target.click(); }
 });
 /* ---------- גיבוי ושחזור ---------- */
