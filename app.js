@@ -260,7 +260,7 @@ const installHelpHTML = () => `<button class="x" data-close aria-label="סגור
 <ol class="help-steps"><li>בהודעה לחצו על <b>״פרטים נוספים״</b> ואז על <b>״התקן בכל זאת״</b>.</li>
 <li>אם אין כפתור כזה: ב-Chrome פתחו את התפריט ⋮ ובחרו <b>״הוסף למסך הבית״</b>, ואז <b>״צור קיצור דרך״</b> (לא ״התקן״). האייקון יופיע במסך הבית ויעבוד כרגיל.</li>
 <li>או פשוט המשיכו להשתמש באתר דרך הדפדפן, בלי להתקין.</li></ol>`;
-const APP_VERSION = "2026.11.25 (v34)";
+const APP_VERSION = "2026.11.25 (v35)";
 const OFF_KEY = "tanachYomi.offline";
 const offStatus = () => { try { const d = localStorage.getItem(OFF_KEY); return d ? "✓ הורד בתאריך " + d + ". אפשר לקרוא בלי אינטרנט." : "מוריד את כל הספרים והפירושים למכשיר, כדי לקרוא גם בלי קליטה (נסיעה, שבת)."; } catch (e) { return ""; } };
 async function offlineDownload() {
@@ -305,7 +305,7 @@ async function hardRefresh() {                                      // מוחק 
 /* ---------- חיפוש חופשי ---------- */
 const SQ = { q: "", full: false, part: false, bk: "", shown: 100, scroll: 0 };
 const NV = {}, NS = {};                                   // טקסט מנורמל לכל ספר (ובגרסת שלד ללא ו/י), נבנה בפעם הראשונה
-const nw = s => s.replace(NIK, "").replace(/[־\-]/g, " ").replace(/[^א-ת\s]/g, "").replace(/\s+/g, " ").trim();
+const nw = s => s.replace(/[־\-]/g, " ").replace(NIK, "").replace(/[^א-ת\s]/g, "").replace(/\s+/g, " ").trim();
 const sk = s => s.replace(/[וי]/g, "");
 const escH = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const TAAM = /[֑-֯]/g;
