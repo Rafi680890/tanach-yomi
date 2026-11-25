@@ -255,29 +255,12 @@ const shareCard = () => `<div class="card sharecard"><div class="shh"><svg viewB
 <button class="sb cp" data-share="copy"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.700 0l3-3a4 4 0 0 0-5.700-5.700l-1 1"/><path d="M14 10a4 4 0 0 0-5.700 0l-3 3A4 4 0 0 0 11 18.700l1-1"/></svg>העתקת קישור</button></div>
 <button class="more" data-share="more"><svg viewBox="0 0 24 24"><path d="M12 15V3M7.500 7.500 12 3l4.500 4.500"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>שתפו באפשרויות נוספות</button>
 <button class="help" data-installhelp>מופיעה אזהרה בהתקנה באנדרואיד? לחצו כאן</button></div>`;
-const REM_TEXT = "📖 למדת היום 2 פרקי תנ״ך? לחצו לפתיחת תנ״ך יומי";
-const remindHTML = os => `<button class="x" data-close aria-label="סגור">✕</button><h3 class="sh" style="margin-top:4px">⏰ תזכורת חכמה</h3>
-<p style="margin:0 0 10px">כשפותחים פייסבוק, אינסטגרם או כל אפליקציה אחרת שתבחרו, הטלפון יציג לכם הודעה: <b>״למדת היום 2 פרקים?״</b>. ההגדרה נעשית פעם אחת בטלפון עצמו, והאפליקציה לא עוקבת אחריכם ולא אוספת שום מידע.</p>
-<div class="rtabs"><button data-remos="ios" class="${os === "ios" ? "on" : ""}">אייפון</button><button data-remos="and" class="${os === "and" ? "on" : ""}">אנדרואיד</button></div>
-${os === "ios" ? `<ol class="help-steps"><li>פתחו את אפליקציית <b>״קיצורי דרך״</b> (Shortcuts) ועברו ללשונית <b>״אוטומציה״</b>.</li>
-<li>לחצו <b>+</b> ואז בחרו <b>״אפליקציה״</b>.</li>
-<li>לחצו <b>״בחר״</b> וסמנו את האפליקציות שרוצים (פייסבוק, אינסטגרם, טיקטוק...). ודאו שמסומן <b>״נפתחת״</b> ולחצו <b>הבא</b>.</li>
-<li>לחצו <b>״הוסף פעולה״</b>, חפשו <b>״הצג התראה״</b> (Show Notification) והדביקו את ההודעה שלמטה.</li>
-<li>לחצו <b>הבא</b>, כבו את <b>״שאל לפני ההפעלה״</b> ובחרו <b>״אל תודיע כשהאוטומציה פועלת״</b>, ואז <b>סיום</b>.</li></ol>` : `<ol class="help-steps"><li>התקינו מחנות Google Play את האפליקציה החינמית <b>MacroDroid</b> (או Tasker).</li>
-<li>צרו מקרו חדש. כ<b>טריגר</b> בחרו <b>״Applications ← Application Launched״</b> וסמנו את האפליקציות שרוצים.</li>
-<li>כ<b>פעולה</b> בחרו <b>״Notification ← Display Notification״</b> והדביקו את ההודעה שלמטה.</li>
-<li>שמרו, ואשרו למערכת להציג התראות ולפעול ברקע.</li></ol>
-<div class="rnote">במכשירי סמסונג אפשר גם דרך <b>״מצבים ושגרות״</b> בהגדרות, אם מופיע שם התנאי ״אפליקציה נפתחת״. שמות התפריטים משתנים בין מכשירים.</div>`}
-<div class="rmsg">${REM_TEXT}</div>
-<div class="nav" style="margin-top:6px"><button class="p" data-remcopy>העתקת ההודעה</button></div>
-<div class="rnote">טיפ: אפשר להוסיף גם פעולה של ״פתח כתובת URL״ עם הקישור ${SHARE_URL} כדי שהאפליקציה תיפתח ישר.</div>`;
-const remCard = () => `<button class="card remcard" data-remind><div class="ri">⏰</div><div><b>תזכורת חכמה</b><span>הודעה ״למדת היום 2 פרקים?״ כשפותחים רשתות חברתיות</span></div><div class="ch">‹</div></button>`;
 const installHelpHTML = () => `<button class="x" data-close aria-label="סגור">✕</button><h3 class="sh" style="margin-top:4px">בעיה בהתקנה באנדרואיד</h3>
 <p style="margin:0 0 10px">אם מופיעה הודעה <b>״Google Play Protect: אפליקציה לא בטוחה נחסמה״</b> - זו אזהרה כללית של אנדרואיד על אפליקציות אינטרנט, והאפליקציה עצמה בטוחה (היא אתר, בלי קבצים מסוכנים). אפשר להמשיך כך:</p>
 <ol class="help-steps"><li>בהודעה לחצו על <b>״פרטים נוספים״</b> ואז על <b>״התקן בכל זאת״</b>.</li>
 <li>אם אין כפתור כזה: ב-Chrome פתחו את התפריט ⋮ ובחרו <b>״הוסף למסך הבית״</b>, ואז <b>״צור קיצור דרך״</b> (לא ״התקן״). האייקון יופיע במסך הבית ויעבוד כרגיל.</li>
 <li>או פשוט המשיכו להשתמש באתר דרך הדפדפן, בלי להתקין.</li></ol>`;
-const APP_VERSION = "2026.11.25 (v33)";
+const APP_VERSION = "2026.11.25 (v34)";
 const OFF_KEY = "tanachYomi.offline";
 const offStatus = () => { try { const d = localStorage.getItem(OFF_KEY); return d ? "✓ הורד בתאריך " + d + ". אפשר לקרוא בלי אינטרנט." : "מוריד את כל הספרים והפירושים למכשיר, כדי לקרוא גם בלי קליטה (נסיעה, שבת)."; } catch (e) { return ""; } };
 async function offlineDownload() {
@@ -496,7 +479,7 @@ function dayView() {
   ${weekStrip(d, isToday)}</div>
   ${bm}${body}${missed}
   <div class="card prog"><div class="ring" style="--p:${pct}"><i>${pct}%</i></div><div style="flex:1"><b style="font-size:18px">התקדמות כללית</b><div style="color:var(--mute);margin:2px 0 8px">${doneCount()} מתוך ${TOTAL} פרקים נלמדו</div><div class="bar"><i style="width:${pct}%"></i></div></div></div>
-  ${remCard()}${shareCard()}${dateNav(d)}${footer(true)}${tabs()}`;
+  ${shareCard()}${dateNav(d)}${footer(true)}${tabs()}`;
 }
 function progressView() {
   let h = `<header class="rh" style="margin-bottom:12px"><button class="home" data-go="day">${I.home}<span>חזרה לדף הבית</span></button><div class="rt">התקדמות</div></header>`;
@@ -510,7 +493,7 @@ function progressView() {
       h += `<div class="bookrow"><button class="book" data-book="${b}"><div class="r"><b>${B[b].n}</b><span>${k} / ${n}</span></div><div class="bar"><i style="width:${k / n * 100}%;background:var(${col})"></i></div></button><button class="bk-all ${full ? "full" : ""}" data-bookall="${b}" data-v="${full ? "0" : "1"}" aria-label="${full ? "בטל סימון של כל " : "סמן כנלמד את כל "}${B[b].n}">${full ? "✓" : "☐"}</button></div>`;
     }
   }
-  h += `<div class="card"><h3 class="sh">💾 גיבוי ושחזור</h3><div style="color:var(--mute);font-size:14px;margin-bottom:8px">ההתקדמות נשמרת רק במכשיר הזה. כדאי לשמור גיבוי, כדי לא לאבד אותה אם נתוני הדפדפן יימחקו או כשעוברים למכשיר אחר.</div><div class="nav" style="justify-content:flex-start"><button data-bk="copy">העתק קוד גיבוי</button><button data-bk="file">שמור גיבוי לקובץ</button><button data-bk="restore">שחזר מקוד</button><button data-bk="load">שחזר מקובץ</button></div><input type="file" id="bkf" accept=".json,application/json" hidden></div>` + remCard() + shareCard();
+  h += `<div class="card"><h3 class="sh">💾 גיבוי ושחזור</h3><div style="color:var(--mute);font-size:14px;margin-bottom:8px">ההתקדמות נשמרת רק במכשיר הזה. כדאי לשמור גיבוי, כדי לא לאבד אותה אם נתוני הדפדפן יימחקו או כשעוברים למכשיר אחר.</div><div class="nav" style="justify-content:flex-start"><button data-bk="copy">העתק קוד גיבוי</button><button data-bk="file">שמור גיבוי לקובץ</button><button data-bk="restore">שחזר מקוד</button><button data-bk="load">שחזר מקובץ</button></div><input type="file" id="bkf" accept=".json,application/json" hidden></div>` + shareCard();
   return h + footer(false) + tabs();
 }
 let selMode = false; const SEL = new Set();
@@ -630,7 +613,7 @@ function settingsHTML() {
 /* ---------- אירועים ---------- */
 document.addEventListener("click", e => {
   if (e.target.id === "ov") return closeSheet();
-  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-sunset],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-remind],[data-remos],[data-remcopy],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk],[data-navback],[data-navfwd],[data-refresh],[data-newver-update],[data-newver-later],[data-reload],[data-smore],[data-sfull],[data-offline],[data-bkdo],[data-bookall],[data-selmode],[data-pick],[data-selact]");
+  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-sunset],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk],[data-navback],[data-navfwd],[data-refresh],[data-newver-update],[data-newver-later],[data-reload],[data-smore],[data-sfull],[data-offline],[data-bkdo],[data-bookall],[data-selmode],[data-pick],[data-selact]");
   if (!t) return;
   const D = t.dataset;
   if (t.hasAttribute("data-close")) closeSheet();
@@ -672,9 +655,6 @@ document.addEventListener("click", e => {
   else if (t.hasAttribute("data-home")) go({ v: "day", date: lastDay || iso(today()) });
   else if (t.hasAttribute("data-share")) shareApp(t.getAttribute("data-share"));
   else if (t.hasAttribute("data-installhelp")) openSheet(installHelpHTML());
-  else if (t.hasAttribute("data-remind")) openSheet(remindHTML(/iphone|ipad|ipod/i.test(navigator.userAgent) ? "ios" : "and"));
-  else if (t.hasAttribute("data-remos")) openSheet(remindHTML(t.getAttribute("data-remos")));
-  else if (t.hasAttribute("data-remcopy")) { try { navigator.clipboard.writeText(REM_TEXT).then(() => toast("ההודעה הועתקה ✓")); } catch (er) { toast("סמנו והעתיקו את ההודעה ידנית"); } }
   else if (t.hasAttribute("data-hint")) { S.hintBm = true; save(); route.keep = true; render(); }
   else if (t.hasAttribute("data-bmclear")) { S.bm = null; save(); toast("הסימניה הוסרה"); route.keep = true; render(); }
   else if (t.hasAttribute("data-retry")) { delete txFail[CH[route.g].b]; render(); }
