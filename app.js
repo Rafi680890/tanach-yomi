@@ -260,7 +260,7 @@ const installHelpHTML = () => `<button class="x" data-close aria-label="סגור
 <ol class="help-steps"><li>בהודעה לחצו על <b>״פרטים נוספים״</b> ואז על <b>״התקן בכל זאת״</b>.</li>
 <li>אם אין כפתור כזה: ב-Chrome פתחו את התפריט ⋮ ובחרו <b>״הוסף למסך הבית״</b>, ואז <b>״צור קיצור דרך״</b> (לא ״התקן״). האייקון יופיע במסך הבית ויעבוד כרגיל.</li>
 <li>או פשוט המשיכו להשתמש באתר דרך הדפדפן, בלי להתקין.</li></ol>`;
-const APP_VERSION = "2026.11.25 (v30)";
+const APP_VERSION = "2026.11.25 (v31)";
 const OFF_KEY = "tanachYomi.offline";
 const offStatus = () => { try { const d = localStorage.getItem(OFF_KEY); return d ? "✓ הורד בתאריך " + d + ". אפשר לקרוא בלי אינטרנט." : "מוריד את כל הספרים והפירושים למכשיר, כדי לקרוא גם בלי קליטה (נסיעה, שבת)."; } catch (e) { return ""; } };
 async function offlineDownload() {
@@ -400,6 +400,23 @@ document.addEventListener("change", e => {
   else if (e.target.id === "sfull") { SQ.full = e.target.checked; SQ.shown = 100; runSearch(); }
   else if (e.target.id === "spart") { SQ.part = e.target.checked; SQ.shown = 100; runSearch(); }
 });
+/* ---------- הודעת "יש גרסה חדשה" ---------- */
+let verDismissed = "", verChecked = 0;
+async function checkNewVersion(force) {
+  if (!force && Date.now() - verChecked < 60000) return; verChecked = Date.now();
+  if (!navigator.onLine) return;
+  try {
+    const r = await fetch("app.js", { cache: "no-store" }); if (!r.ok) return;
+    const m = /APP_VERSION\s*=\s*"([^"]+)"/.exec(await r.text());
+    if (m && m[1] !== APP_VERSION && m[1] !== verDismissed) showNewVer(m[1]);
+  } catch (e) {}
+}
+function showNewVer(v) {
+  if ($("#newver")) return;
+  const d = document.createElement("div"); d.id = "newver"; d.className = "newver"; d.setAttribute("role", "status"); d.dataset.v = v;
+  d.innerHTML = '<span>יש גרסה חדשה של האפליקציה</span><button class="nvu" data-newver-update>עדכנו עכשיו</button><button class="nvx" data-newver-later aria-label="סגירה">✕</button>';
+  document.body.appendChild(d);
+}
 const MAM_SRC = "https://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%AA%D7%9E%D7%A9:Dovi/%D7%9E%D7%A7%D7%A8%D7%90_%D7%A2%D7%9C_%D7%A4%D7%99_%D7%94%D7%9E%D7%A1%D7%95%D7%A8%D7%94";
 function footer(src) {
   return `<footer class="ft"><div class="cp">© רפאל בטיט · כל הזכויות שמורות על עיצוב ופיתוח האפליקציה</div><div class="ver">גרסה ${APP_VERSION}</div><button class="refbtn" data-refresh>🔄 ריענון לגירסה חדשה</button><div class="vernote">הריענון מוריד את הגרסה העדכנית. ההתקדמות והסימניות שלך נשמרות.</div><button class="offbtn" data-offline>📥 הורדה לקריאה אופליין</button><div class="vernote" id="offst">${offStatus()}</div>${src ? `<div class="src">נוסח המקרא: <a href="${MAM_SRC}" target="_blank" rel="noopener">מקרא על פי המסורה (MAM)</a>, ברישיון CC-BY-SA, באמצעות ספריא. בתצוגה זו הוצג הקרי בלבד במקום כתיב וקרי, הוסרו סימוני פתוחות וסתומות, וטעמי המקרא ניתנים להסתרה. פירושי מצודת דוד ומצודת ציון: נחלת הכלל. קישורי שמע ולימוד: הרב מוטי פרנקו (Spotify) וישיבת הר עציון.</div>` : ""}</footer>`;
@@ -596,7 +613,7 @@ function settingsHTML() {
 /* ---------- אירועים ---------- */
 document.addEventListener("click", e => {
   if (e.target.id === "ov") return closeSheet();
-  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-sunset],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk],[data-navback],[data-navfwd],[data-refresh],[data-reload],[data-smore],[data-sfull],[data-offline],[data-bkdo],[data-bookall],[data-selmode],[data-pick],[data-selact]");
+  const t = e.target.closest("[data-go],[data-read],[data-toggle],[data-day],[data-week],[data-sunset],[data-today],[data-jump],[data-book],[data-bm],[data-fs],[data-set],[data-sw],[data-th],[data-p],[data-close],[data-next],[data-prev],[data-home],[data-hint],[data-undo],[data-share],[data-installhelp],[data-bmclear],[data-retry],[data-join],[data-markall],[data-bk],[data-navback],[data-navfwd],[data-refresh],[data-newver-update],[data-newver-later],[data-reload],[data-smore],[data-sfull],[data-offline],[data-bkdo],[data-bookall],[data-selmode],[data-pick],[data-selact]");
   if (!t) return;
   const D = t.dataset;
   if (t.hasAttribute("data-close")) closeSheet();
@@ -606,6 +623,8 @@ document.addEventListener("click", e => {
   else if (D.th) { S.theme = D.th; applyTheme(); save(); document.querySelectorAll("#sheet [data-th]").forEach(b => b.classList.toggle("on", b.dataset.th === S.theme)); }
   else if (D.fs && t.closest("#sheet")) { S.fs = Math.min(48, Math.max(16, S.fs + +D.fs)); save(); const tx = $(".text"); if (tx) tx.style.setProperty("--fs", S.fs + "px"); const lb = t.parentElement.querySelector(".on"); if (lb) lb.textContent = S.fs; }
   else if (t.hasAttribute("data-refresh")) hardRefresh();
+  else if (t.hasAttribute("data-newver-update")) hardRefresh();
+  else if (t.hasAttribute("data-newver-later")) { const b = $("#newver"); if (b) { verDismissed = b.dataset.v; b.remove(); } }
   else if (t.hasAttribute("data-reload")) location.reload();
   else if (t.hasAttribute("data-smore")) { SQ.shown += 100; drawResults(); }
   else if (t.hasAttribute("data-sfull")) { SQ.full = true; SQ.shown = 100; const cb = $("#sfull"); if (cb) cb.checked = true; runSearch(); }
@@ -736,9 +755,10 @@ let hiddenAt = 0;
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") { hiddenAt = Date.now(); return; }
   if (hiddenAt && Date.now() - hiddenAt > 3 * 3600e3 && route.v === "day" && route.date !== iso(today())) go({ v: "day", date: iso(today()) }, true);   // חזרה אחרי זמן רב - מתחילים מהיום
-  checkDayRoll();
+  checkDayRoll(); checkNewVersion();
 });
 window.addEventListener("pageshow", checkDayRoll); window.addEventListener("focus", checkDayRoll);
 setInterval(checkDayRoll, 30000);
+setInterval(checkNewVersion, 30 * 60000); setTimeout(checkNewVersion, 5000);
 fromHash();
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(err => console.error("SW registration failed:", err));
