@@ -260,7 +260,7 @@ const installHelpHTML = () => `<button class="x" data-close aria-label="סגור
 <ol class="help-steps"><li>בהודעה לחצו על <b>״פרטים נוספים״</b> ואז על <b>״התקן בכל זאת״</b>.</li>
 <li>אם אין כפתור כזה: ב-Chrome פתחו את התפריט ⋮ ובחרו <b>״הוסף למסך הבית״</b>, ואז <b>״צור קיצור דרך״</b> (לא ״התקן״). האייקון יופיע במסך הבית ויעבוד כרגיל.</li>
 <li>או פשוט המשיכו להשתמש באתר דרך הדפדפן, בלי להתקין.</li></ol>`;
-const APP_VERSION = "2026.11.25 (v31)";
+const APP_VERSION = "2026.11.25 (v32)";
 const OFF_KEY = "tanachYomi.offline";
 const offStatus = () => { try { const d = localStorage.getItem(OFF_KEY); return d ? "✓ הורד בתאריך " + d + ". אפשר לקרוא בלי אינטרנט." : "מוריד את כל הספרים והפירושים למכשיר, כדי לקרוא גם בלי קליטה (נסיעה, שבת)."; } catch (e) { return ""; } };
 async function offlineDownload() {
